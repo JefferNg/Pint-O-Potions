@@ -14,8 +14,16 @@ router = APIRouter(
 @router.get("/audit")
 def get_inventory():
     """ """
-    
-    return {"number_of_potions": 0, "ml_in_barrels": 0, "gold": 0}
+    with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
+    num = 0
+    ml = 0
+    gold = 0
+    for row in result:
+        num = row.num_green_potions
+        ml = row.num_green_ml
+        gold = row.gold
+    return {"number_of_potions": num, "ml_in_barrels": ml, "gold": gold}
 
 # Gets called once a day
 @router.post("/plan")
@@ -26,8 +34,8 @@ def get_capacity_plan():
     """
 
     return {
-        "potion_capacity": 0,
-        "ml_capacity": 0
+        "potion_capacity": 50,
+        "ml_capacity": 10000
         }
 
 class CapacityPurchase(BaseModel):

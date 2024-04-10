@@ -61,8 +61,8 @@ def search_orders(
         "results": [
             {
                 "line_item_id": 1,
-                "item_sku": "1 oblivion potion",
-                "customer_name": "Scaramouche",
+                "item_sku": potion_sku,
+                "customer_name": customer_name,
                 "line_item_total": 50,
                 "timestamp": "2021-01-01T00:00:00Z",
             }
@@ -81,17 +81,14 @@ def post_visits(visit_id: int, customers: list[Customer]):
     Which customers visited the shop today?
     """
     print(customers)
-    with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_green_potions = 10"))
-
+    
     return "OK"
 
 
 @router.post("/")
 def create_cart(new_cart: Customer):
     """ """
-    with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_green_potions = 10"))
+
     return {"cart_id": 1}
 
 
@@ -103,7 +100,11 @@ class CartItem(BaseModel):
 def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
     """ """
     with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_green_potions = 10"))
+        result = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
+        for row in result:
+            if row.num_green_potions - cart_item.quantity > 0:
+                result = connection.execute(sqlalchemy.text
+                (f"UPDATE global_inventory SET num_green_potions = {row.num_green_potions - cart_item.quantity}"))
     return "OK"
 
 
@@ -114,5 +115,7 @@ class CartCheckout(BaseModel):
 def checkout(cart_id: int, cart_checkout: CartCheckout):
     """ """
     with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_green_potions = 10"))
+        result = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
+        for row in result:
+            result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {row.gold + 50}"))
     return {"total_potions_bought": 1, "total_gold_paid": 50}
