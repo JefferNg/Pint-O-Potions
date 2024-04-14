@@ -30,8 +30,7 @@ def post_deliver_barrels(barrels_delivered: list[Barrel], order_id: int):
             for barrel in barrels_delivered:
                 if barrel.sku == "SMALL_GREEN_BARREL":
                     result = connection.execute(sqlalchemy.text
-                    (f"UPDATE global_inventory SET num_green_ml = {
-                        (barrels_delivered[0].ml_per_barrel + row.num_green_ml)*barrels_delivered[0].quantity}"))
+                    (f"UPDATE global_inventory SET num_green_ml = {(barrels_delivered[0].ml_per_barrel + row.num_green_ml)*barrels_delivered[0].quantity}"))
 
     return "OK"
 
