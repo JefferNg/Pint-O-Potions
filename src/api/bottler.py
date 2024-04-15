@@ -21,12 +21,32 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int
     print(f"potions delievered: {potions_delivered} order_id: {order_id}")
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
-        for row in result:
-            if row.num_green_ml / (100 * potions_delivered[0].quantity) > 0:
-                result = connection.execute(sqlalchemy.text
-                (f"UPDATE global_inventory SET num_green_potions = {potions_delivered[0].quantity + row.num_green_potions}"))
-                result = connection.execute(sqlalchemy.text
-                (f"UPDATE global_inventory SET num_green_ml = {row.num_green_ml - (100 * potions_delivered[0].quantity)}"))
+    potion_mix = potions_delivered[0].potion_type
+    for row in result:
+        if potion_mix[0] == 100:
+            # update green bottle and ml count
+            result = connection.execute(sqlalchemy.text
+            (f"UPDATE global_inventory SET num_green_potions = {potions_delivered[0].quantity + row.num_green_potions}"))
+            result = connection.execute(sqlalchemy.text
+            (f"UPDATE global_inventory SET num_green_ml = {row.num_green_ml - potion_mix[0]}"))
+        if potion_mix[1] == 100:
+            # update red bottle and ml count
+            result = connection.execute(sqlalchemy.text
+            (f"UPDATE global_inventory SET num_red_potions = {potions_delivered[0].quantity + row.num_red_potions}"))
+            result = connection.execute(sqlalchemy.text
+            (f"UPDATE global_inventory SET num_red_ml = {row.num_red_ml - potion_mix[1]}"))
+        if potion_mix[2] == 100:
+            # update blue bottle and ml count
+            result = connection.execute(sqlalchemy.text
+            (f"UPDATE global_inventory SET num_blue_potions = {potions_delivered[0].quantity + row.num_blue_potions}"))
+            result = connection.execute(sqlalchemy.text
+            (f"UPDATE global_inventory SET num_blue_ml = {row.num_blue_ml - potion_mix[2]}"))
+
+        # if row.num_green_ml / (100 * potions_delivered[0].quantity) > 0:
+        #     result = connection.execute(sqlalchemy.text
+        #     (f"UPDATE global_inventory SET num_green_potions = {potions_delivered[0].quantity + row.num_green_potions}"))
+        #     result = connection.execute(sqlalchemy.text
+        #     (f"UPDATE global_inventory SET num_green_ml = {row.num_green_ml - (100 * potions_delivered[0].quantity)}"))
 
     return "OK"
 
@@ -74,30 +94,39 @@ def get_bottle_plan():
             "potion_type": [0, 0, 100, 0],
             "quantity": 1,
         })
-    elif green_ml + red_ml + blue_ml < 100:
-        # do not bottle because not enough supplies
-        bottle_plan.append({
-            "potion_type": [0, 0, 0, 0],
-            "quantity": 0,
-        })
     else:
-        # mix green first, then red, then blue
-        total = green_ml
-        for i in range(1, red_ml):
-            if total + i > 100:
-                break
-            total += 1
-            red_mix += 1
-        for i in range(1, blue_ml):
-            if total + 1 > 100:
-                break
-            total += 1
-            blue_mix += 1
-        
         bottle_plan.append({
-            "potion_type": [green_ml, red_mix, blue_mix, 0],
-            "quantity": 1,
-        })
+             "potion_type": [0, 0, 0, 0],
+             "quantity": 0,
+         })
+    
+
+    ### VERSION 3 (did too much, whoops):
+
+    # elif green_ml + red_ml + blue_ml < 100:
+    #     # do not bottle because not enough supplies
+    #     bottle_plan.append({
+    #         "potion_type": [0, 0, 0, 0],
+    #         "quantity": 0,
+    #     })
+    # else:
+    #     # mix green first, then red, then blue
+    #     total = green_ml
+    #     for i in range(1, red_ml):
+    #         if total + i > 100:
+    #             break
+    #         total += 1
+    #         red_mix += 1
+    #     for i in range(1, blue_ml):
+    #         if total + 1 > 100:
+    #             break
+    #         total += 1
+    #         blue_mix += 1
+        
+    #     bottle_plan.append({
+    #         "potion_type": [green_ml, red_mix, blue_mix, 0],
+    #         "quantity": 1,
+    #     })
 
 
 
