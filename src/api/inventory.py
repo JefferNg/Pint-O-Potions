@@ -20,8 +20,8 @@ def get_inventory():
     ml = 0
     gold = 0
     for row in result:
-        num = row.num_green_potions
-        ml = row.num_green_ml
+        num = row.num_green_potions + row.num_red_potions + row.num_blue_potions
+        ml = row.num_green_ml + row.num_red_ml + row.num_blue_ml
         gold = row.gold
     return {"number_of_potions": num, "ml_in_barrels": ml, "gold": gold}
 
