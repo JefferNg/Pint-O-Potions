@@ -43,19 +43,65 @@ def get_bottle_plan():
     # Initial logic: bottle all barrels into red potions.
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
-    ml = 0
+    green_ml = 0
+    red_ml = 0
+    blue_ml = 0
     for row in result:
-        ml = row.num_green_ml
-    num = ml % 100
-    ml /= 100
-    if ml > 0:
-        num += 1
-    return [
-            {
-                "potion_type": [100, 0, 0, 0],
-                "quantity": num,
-            }
-        ]
+        green_ml = row.num_green_ml
+        red_ml = row.num_red_ml
+        blue_ml = row.num_blue_ml
+
+    bottle_plan = []
+
+    red_mix = 0
+    blue_mix = 0
+
+    if green_ml >= 100:
+        # bottle only green
+        bottle_plan.append({
+            "potion_type": [100, 0, 0, 0],
+            "quantity": 1,
+        })
+    elif red_ml >= 100:
+        # bottle only red
+        bottle_plan.append({
+            "potion_type": [0, 100, 0, 0],
+            "quantity": 1,
+        })
+    elif blue_ml >= 100:
+        # bottle only blue
+        bottle_plan.append({
+            "potion_type": [0, 0, 100, 0],
+            "quantity": 1,
+        })
+    elif green_ml + red_ml + blue_ml < 100:
+        # do not bottle because not enough supplies
+        bottle_plan.append({
+            "potion_type": [0, 0, 0, 0],
+            "quantity": 0,
+        })
+    else:
+        # mix green first, then red, then blue
+        total = green_ml
+        for i in range(1, red_ml):
+            if total + i > 100:
+                break
+            total += 1
+            red_mix += 1
+        for i in range(1, blue_ml):
+            if total + 1 > 100:
+                break
+            total += 1
+            blue_mix += 1
+        
+        bottle_plan.append({
+            "potion_type": [green_ml, red_mix, blue_mix, 0],
+            "quantity": 1,
+        })
+
+
+
+    return bottle_plan
 
 if __name__ == "__main__":
     print(get_bottle_plan())
