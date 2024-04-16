@@ -4,6 +4,7 @@ from src.api import auth
 from enum import Enum
 import sqlalchemy
 from src import database as db
+import random
 
 router = APIRouter(
     prefix="/carts",
@@ -84,12 +85,30 @@ def post_visits(visit_id: int, customers: list[Customer]):
     
     return "OK"
 
+class Cart:
+    def __init__(self, cart_id, customer, potion, quantity):
+        self.cart_id = cart_id
+        self.customer = customer
+        self.potion = potion
+        self.quantity = quantity
+
+cart_dict = {
+    "cart": []
+}
+
+
+cart_num = 0
 
 @router.post("/")
 def create_cart(new_cart: Customer):
     """ """
-
-    return {"cart_id": 1}
+    global cart_num
+    cart_num += 1
+    cart = Cart(cart_num, new_cart, "", 0)
+    cart_list = cart_dict.get("cart")
+    cart_list.append(cart)
+    cart_dict.update({"cart": cart_list})
+    return {"cart_id": cart_num}
 
 
 class CartItem(BaseModel):
@@ -101,10 +120,21 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
     """ """
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
-        for row in result:
-            if row.num_green_potions - cart_item.quantity > 0:
-                result = connection.execute(sqlalchemy.text
-                (f"UPDATE global_inventory SET num_green_potions = {row.num_green_potions - cart_item.quantity}"))
+    for row in result:
+        for cart in cart_dict.get("cart"):
+            if cart.cart_id == cart_id:
+                if item_sku == "GREEN_POTIONS_0":
+                    if row.num_green_potions - cart_item.quantity > 0:
+                        cart.potion = item_sku
+                        cart.quantity = cart_item.quantity
+                if item_sku == "RED_POTIONS_0":
+                    if row.num_red_potions - cart_item.quantity > 0:
+                        cart.potion = item_sku
+                        cart.quantity = cart_item.quantity
+                if item_sku == "BLUE_POTIONS_0":
+                    if row.num_blue_potions - cart_item.quantity > 0:
+                        cart.potion = item_sku
+                        cart.quantity = cart_item.quantity     
     return "OK"
 
 
@@ -116,6 +146,24 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
     """ """
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
-        for row in result:
-            result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {row.gold + 50}"))
-    return {"total_potions_bought": 1, "total_gold_paid": 50}
+    for row in result:
+        for cart in cart_dict.get("cart"):
+            print(cart.cart_id)
+            if cart.cart_id == cart_id:
+                print(cart.potion, cart.quantity)
+                if cart.potion == "GREEN_POTIONS_0":
+                    #print("sold green")
+                    result = connection.execute(sqlalchemy.text
+                    (f"UPDATE global_inventory SET num_green_potions = {row.num_green_potions - cart.quantity}"))
+                    result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {row.gold + cart.quantity * 50}"))
+                if cart.potion == "RED_POTIONS_0":
+                    #print("sold red")
+                    result = connection.execute(sqlalchemy.text
+                    (f"UPDATE global_inventory SET num_red_potions = {row.num_red_potions - cart.quantity}"))
+                    result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {row.gold + cart.quantity * 50}"))
+                if cart.potion == "BLUE_POTIONS_0":
+                    #print("sold blue")
+                    result = connection.execute(sqlalchemy.text
+                    (f"UPDATE global_inventory SET num_blue_potions = {row.num_blue_potions - cart.quantity}"))
+                    result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {row.gold + cart.quantity * 50}"))
+    return {"total_potions_bought": cart.quantity, "total_gold_paid": cart.quantity * 50}
