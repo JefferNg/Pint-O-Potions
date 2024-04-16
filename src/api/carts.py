@@ -86,11 +86,10 @@ def post_visits(visit_id: int, customers: list[Customer]):
     return "OK"
 
 class Cart:
-    def __init__(self, cart_id, customer, potion, quantity):
+    def __init__(self, cart_id, customer, potion_quantity):
         self.cart_id = cart_id
         self.customer = customer
-        self.potion = potion
-        self.quantity = quantity
+        self.potion_quantity = potion_quantity
 
 cart_dict = {
     "cart": []
@@ -104,7 +103,7 @@ def create_cart(new_cart: Customer):
     """ """
     global cart_num
     cart_num += 1
-    cart = Cart(cart_num, new_cart, "", 0)
+    cart = Cart(cart_num, new_cart, {})
     cart_list = cart_dict.get("cart")
     cart_list.append(cart)
     cart_dict.update({"cart": cart_list})
@@ -125,16 +124,13 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
             if cart.cart_id == cart_id:
                 if item_sku == "GREEN_POTIONS_0":
                     if row.num_green_potions - cart_item.quantity > 0:
-                        cart.potion = item_sku
-                        cart.quantity = cart_item.quantity
+                        cart.potion_quantity.update({item_sku: cart_item.quantity})
                 if item_sku == "RED_POTIONS_0":
                     if row.num_red_potions - cart_item.quantity > 0:
-                        cart.potion = item_sku
-                        cart.quantity = cart_item.quantity
+                        cart.potion_quantity.update({item_sku: cart_item.quantity})
                 if item_sku == "BLUE_POTIONS_0":
                     if row.num_blue_potions - cart_item.quantity > 0:
-                        cart.potion = item_sku
-                        cart.quantity = cart_item.quantity     
+                        cart.potion_quantity.update({item_sku: cart_item.quantity})  
     return "OK"
 
 
@@ -146,24 +142,24 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
     """ """
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
+    total = 0
     for row in result:
         for cart in cart_dict.get("cart"):
-            print(cart.cart_id)
             if cart.cart_id == cart_id:
-                print(cart.potion, cart.quantity)
-                if cart.potion == "GREEN_POTIONS_0":
-                    #print("sold green")
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE global_inventory SET num_green_potions = {row.num_green_potions - cart.quantity}"))
-                    result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {row.gold + cart.quantity * 50}"))
-                if cart.potion == "RED_POTIONS_0":
-                    #print("sold red")
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE global_inventory SET num_red_potions = {row.num_red_potions - cart.quantity}"))
-                    result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {row.gold + cart.quantity * 50}"))
-                if cart.potion == "BLUE_POTIONS_0":
-                    #print("sold blue")
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE global_inventory SET num_blue_potions = {row.num_blue_potions - cart.quantity}"))
-                    result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {row.gold + cart.quantity * 50}"))
-    return {"total_potions_bought": cart.quantity, "total_gold_paid": cart.quantity * 50}
+                for potion in cart.potion_quantity.keys():
+                    if potion == "GREEN_POTIONS_0":
+                        total += cart.potion_quantity.get(potion)
+                        result = connection.execute(sqlalchemy.text
+                        (f"UPDATE global_inventory SET num_green_potions = {row.num_green_potions - cart.quantity}"))
+                        result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {row.gold + cart.quantity * 50}"))
+                    if potion == "RED_POTIONS_0":
+                        total += cart.potion_quantity.get(potion)
+                        result = connection.execute(sqlalchemy.text
+                        (f"UPDATE global_inventory SET num_red_potions = {row.num_red_potions - cart.quantity}"))
+                        result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {row.gold + cart.quantity * 50}"))
+                    if potion == "BLUE_POTIONS_0":
+                        total += cart.potion_quantity.get(potion)
+                        result = connection.execute(sqlalchemy.text
+                        (f"UPDATE global_inventory SET num_blue_potions = {row.num_blue_potions - cart.quantity}"))
+                        result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {row.gold + cart.quantity * 50}"))
+    return {"total_potions_bought": total, "total_gold_paid": total * 50}
