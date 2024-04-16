@@ -20,6 +20,10 @@ def reset():
         result = connection.execute(sqlalchemy.text("UPDATE global_inventory SET gold = 100"))
         result = connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_green_potions = 0"))
         result = connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_green_ml = 0"))
+        result = connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_red_potions = 0"))
+        result = connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_red_ml = 0"))
+        result = connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_blue_potions = 0"))
+        result = connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_blue_ml = 0"))
 
     return "OK"
 
