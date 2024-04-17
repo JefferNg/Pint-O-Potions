@@ -27,18 +27,22 @@ def post_deliver_barrels(barrels_delivered: list[Barrel], order_id: int):
         result = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
     for row in result:
         for barrel in barrels_delivered:
-            if barrel.sku == "SMALL_GREEN_BARREL":
+            if barrel.potion_type == [0,1,0,0]:
                 if row.num_green_potions < 10:
                     result = connection.execute(sqlalchemy.text
                     (f"UPDATE global_inventory SET num_green_ml = {(barrel.ml_per_barrel + row.num_green_ml)*barrel.quantity}"))
-            if barrel.sku == "SMALL_RED_BARREL":
+            if barrel.potion_type == [1,0,0,0]:
                 if row.num_red_potions < 15:
                     result = connection.execute(sqlalchemy.text
                     (f"UPDATE global_inventory SET num_red_ml = {(barrel.ml_per_barrel + row.num_red_ml)*barrel.quantity}"))
-            if barrel.sku == "SMALL_BLUE_BARREL":
+            if barrel.potion_type == [0,0,1,0]:
                 if row.num_blue_potions < 5:
                     result = connection.execute(sqlalchemy.text
                     (f"UPDATE global_inventory SET num_blue_ml = {(barrel.ml_per_barrel + row.num_blue_ml)*barrel.quantity}"))
+            if barrel.potion_type == [0,0,0,1]:
+                if row.num_dark_potions < 5:
+                    result = connection.execute(sqlalchemy.text
+                    (f"UPDATE global_inventory SET num_dark_ml = {(barrel.ml_per_barrel + row.num_dark_ml)*barrel.quantity}"))
 
 
     return "OK"
@@ -57,33 +61,44 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     barrel_plan = []
     for barrel in wholesale_catalog:
         # cycle through different barrels
-        if (barrel.sku == "SMALL_GREEN_BARREL"):
+        if (barrel.potion_type == [1,0,0,0]):
             if barrel.price <= gold:
                 barrel_plan.append(        {
-                    "sku": "SMALL_GREEN_BARREL",
+                    "sku": barrel.sku,
                     "ml_per_barrel": barrel.ml_per_barrel,
                     "potion_type": barrel.potion_type,
                     "price": barrel.price,
                     "quantity": 1,
                 })
-        if (barrel.sku == "SMALL_RED_BARREL"):
+        elif (barrel.potion_type == [0,1,0,0]):
             if barrel.price <= gold:
                 barrel_plan.append(        {
-                    "sku": "SMALL_RED_BARREL",
+                    "sku": barrel.sku,
                     "ml_per_barrel": barrel.ml_per_barrel,
                     "potion_type": barrel.potion_type,
                     "price": barrel.price,
                     "quantity": 1,
                 })
-        if (barrel.sku == "SMALL_BLUE_BARREL"):
+        elif (barrel.potion_type == [0,0,1,0]):
             if barrel.price <= gold:
                 barrel_plan.append(        {
-                    "sku": "SMALL_BLUE_BARREL",
+                    "sku": barrel.sku,
                     "ml_per_barrel": barrel.ml_per_barrel,
                     "potion_type": barrel.potion_type,
                     "price": barrel.price,
                     "quantity": 1,
                 })
+        elif (barrel.potion_type == [0,0,0,1]):
+            if barrel.price <= gold:
+                barrel_plan.append(        {
+                    "sku": barrel.sku,
+                    "ml_per_barrel": barrel.ml_per_barrel,
+                    "potion_type": barrel.potion_type,
+                    "price": barrel.price,
+                    "quantity": 1,
+                })
+        else:
+            raise Exception("Invalid Potion Type")
 
 
     return barrel_plan
