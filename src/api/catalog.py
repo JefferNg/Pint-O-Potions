@@ -12,15 +12,15 @@ def get_catalog():
     """
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
-    green_potions = 0
-    red_potions = 0
-    blue_potions = 0
-    dark_potions = 0
-    for row in result:
-        green_potions = row.num_green_potions
-        red_potions = row.num_red_potions
-        blue_potions = row.num_blue_potions
-        dark_potions = row.num_dark_potions
+        green_potions = 0
+        red_potions = 0
+        blue_potions = 0
+        dark_potions = 0
+        for row in result:
+            green_potions = row.num_green_potions
+            red_potions = row.num_red_potions
+            blue_potions = row.num_blue_potions
+            dark_potions = row.num_dark_potions
     catalog = []
     if red_potions > 0:
         catalog.append(            {
