@@ -69,15 +69,17 @@ def get_bottle_plan():
         green_ml = 0
         red_ml = 0
         blue_ml = 0
+        dark_ml = 0
         for row in result:
             green_ml = row.num_green_ml
             red_ml = row.num_red_ml
             blue_ml = row.num_blue_ml
+            dark_ml = row.num_dark_ml
 
     bottle_plan = []
 
-    red_mix = 0
-    blue_mix = 0
+    # red_mix = 0
+    # blue_mix = 0
 
     if green_ml >= 100:
         # bottle only green
