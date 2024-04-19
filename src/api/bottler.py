@@ -25,17 +25,17 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int
         for row in result:
             for potions in potions_delivered:
                 if potion_mix[0] == 100:
-                    # update green bottle and ml count
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE global_inventory SET num_green_potions = {potions.quantity + row.num_green_potions}"))
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE global_inventory SET num_green_ml = {row.num_green_ml - potion_mix[0]}"))
-                elif potion_mix[1] == 100:
                     # update red bottle and ml count
                     result = connection.execute(sqlalchemy.text
                     (f"UPDATE global_inventory SET num_red_potions = {potions.quantity + row.num_red_potions}"))
                     result = connection.execute(sqlalchemy.text
-                    (f"UPDATE global_inventory SET num_red_ml = {row.num_red_ml - potion_mix[1]}"))
+                    (f"UPDATE global_inventory SET num_red_ml = {row.num_red_ml - potion_mix[0]}"))
+                elif potion_mix[1] == 100:
+                    # update green bottle and ml count
+                    result = connection.execute(sqlalchemy.text
+                    (f"UPDATE global_inventory SET num_green_potions = {potions.quantity + row.num_green_potions}"))
+                    result = connection.execute(sqlalchemy.text
+                    (f"UPDATE global_inventory SET num_green_ml = {row.num_green_ml - potion_mix[1]}"))
                 elif potion_mix[2] == 100:
                     # update blue bottle and ml count
                     result = connection.execute(sqlalchemy.text
