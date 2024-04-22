@@ -75,7 +75,11 @@ def get_bottle_plan():
             blue_ml = row.num_blue_ml
             dark_ml = row.num_dark_ml
 
-    bottle_plan = []
+    # bottle no potions if ml not sufficient
+    bottle_plan = [{
+             "potion_type": [0, 0, 0, 0],
+             "quantity": 0,
+         }]
 
     # red_mix = 0
     # blue_mix = 0
@@ -86,33 +90,31 @@ def get_bottle_plan():
             "potion_type": [0, 100, 0, 0],
             "quantity": 1,
         })
-    elif red_ml >= 100:
+    if red_ml >= 100:
         # bottle only red
         bottle_plan.append({
             "potion_type": [100, 0, 0, 0],
             "quantity": 1,
         })
-    elif blue_ml >= 100:
+    if blue_ml >= 100:
         # bottle only blue
         bottle_plan.append({
             "potion_type": [0, 0, 100, 0],
             "quantity": 1,
         })
-    elif dark_ml >= 100:
+    if dark_ml >= 100:
         # bottle only dark
         bottle_plan.append({
             "potion_type": [0, 0, 0, 100],
             "quantity": 1,
         })
-    else:
-        # bottle no potions
-        bottle_plan.append({
-             "potion_type": [0, 0, 0, 0],
-             "quantity": 0,
-         })
     
+    if len(bottle_plan) > 1:
+        # potions were mixed
+        bottle_plan.pop(0)
+
     print(f"Current bottle plan: {bottle_plan}" )
-    ### VERSION 3 (did too much, whoops):
+    ### VERSION 3:
 
     # elif green_ml + red_ml + blue_ml < 100:
     #     # do not bottle because not enough supplies
