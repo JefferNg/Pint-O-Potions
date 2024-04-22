@@ -24,32 +24,32 @@ def get_catalog():
     catalog = []
     if red_potions > 0:
         catalog.append(            {
-                "sku": "RED_POTIONS_0",
-                "name": "red potion",
+                "sku": "RED_POTION",
+                "name": "Health",
                 "quantity": red_potions,
                 "price": 50,
                 "potion_type": [100, 0, 0, 0],
             })
     if green_potions > 0:
         catalog.append(            {
-                "sku": "GREEN_POTIONS_0",
-                "name": "green potion",
+                "sku": "GREEN_POTION",
+                "name": "Leap",
                 "quantity": green_potions,
                 "price": 50,
                 "potion_type": [0, 100, 0, 0],
             })
     if blue_potions > 0:
         catalog.append(            {
-                "sku": "BLUE_POTIONS_0",
-                "name": "blue potion",
+                "sku": "BLUE_POTION",
+                "name": "Swiftness",
                 "quantity": blue_potions,
                 "price": 50,
                 "potion_type": [0, 0, 100, 0],
             })
     if dark_potions > 0:
         catalog.append(            {
-                "sku": "DARK_POTIONS_0",
-                "name": "dark potion",
+                "sku": "DARK_POTION",
+                "name": "Invisibility",
                 "quantity": dark_potions,
                 "price": 50,
                 "potion_type": [0, 0, 0, 100],
