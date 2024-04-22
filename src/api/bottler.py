@@ -57,7 +57,7 @@ def get_bottle_plan():
     """
     Go from barrel to bottle.
     """
-
+    print("Getting potion plan")
     # Each bottle has a quantity of what proportion of red, blue, and
     # green potion to add.
     # Expressed in integers from 1 to 100 that must sum up to 100.
@@ -83,13 +83,13 @@ def get_bottle_plan():
     if green_ml >= 100:
         # bottle only green
         bottle_plan.append({
-            "potion_type": [100, 0, 0, 0],
+            "potion_type": [0, 100, 0, 0],
             "quantity": 1,
         })
     elif red_ml >= 100:
         # bottle only red
         bottle_plan.append({
-            "potion_type": [0, 100, 0, 0],
+            "potion_type": [100, 0, 0, 0],
             "quantity": 1,
         })
     elif blue_ml >= 100:
@@ -111,7 +111,7 @@ def get_bottle_plan():
              "quantity": 0,
          })
     
-
+    print(f"Current bottle plan: {bottle_plan}" )
     ### VERSION 3 (did too much, whoops):
 
     # elif green_ml + red_ml + blue_ml < 100:
