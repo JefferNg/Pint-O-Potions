@@ -31,18 +31,26 @@ def post_deliver_barrels(barrels_delivered: list[Barrel], order_id: int):
                     if row.num_green_potions < 10:
                         result = connection.execute(sqlalchemy.text
                         (f"UPDATE global_inventory SET num_green_ml = {row.num_green_ml + (barrel.ml_per_barrel*barrel.quantity)}"))
+                        result = connection.execute(sqlalchemy.text
+                        (f"UPDATE global_inventory SET gold = {row.gold - barrel.price}"))
                 elif barrel.potion_type == [1,0,0,0]:
                     if row.num_red_potions < 15:
                         result = connection.execute(sqlalchemy.text
                         (f"UPDATE global_inventory SET num_red_ml = {row.num_red_ml + (barrel.ml_per_barrel*barrel.quantity)}"))
+                        result = connection.execute(sqlalchemy.text
+                        (f"UPDATE global_inventory SET gold = {row.gold - barrel.price}"))
                 elif barrel.potion_type == [0,0,1,0]:
                     if row.num_blue_potions < 5:
                         result = connection.execute(sqlalchemy.text
                         (f"UPDATE global_inventory SET num_blue_ml = {row.num_blue_ml + (barrel.ml_per_barrel*barrel.quantity)}"))
+                        result = connection.execute(sqlalchemy.text
+                        (f"UPDATE global_inventory SET gold = {row.gold - barrel.price}"))
                 elif barrel.potion_type == [0,0,0,1]:
                     if row.num_dark_potions < 5:
                         result = connection.execute(sqlalchemy.text
                         (f"UPDATE global_inventory SET num_dark_ml = {row.num_dark_ml + (barrel.ml_per_barrel*barrel.quantity)}"))
+                        result = connection.execute(sqlalchemy.text
+                        (f"UPDATE global_inventory SET gold = {row.gold - barrel.price}"))
 
 
     return "OK"
