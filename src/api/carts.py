@@ -81,7 +81,7 @@ def post_visits(visit_id: int, customers: list[Customer]):
     """
     Which customers visited the shop today?
     """
-    print(customers)
+    print(f"A customer visited the shop! \n{customers}")
     
     return "OK"
 
@@ -107,6 +107,7 @@ def create_cart(new_cart: Customer):
     cart_list = cart_dict.get("cart")
     cart_list.append(cart)
     cart_dict.update({"cart": cart_list})
+    print(f"cart created by {new_cart}")
     return {"cart_id": cart_num}
 
 
@@ -134,6 +135,7 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
                     if item_sku == "DARK_POTION":
                         if row.num_dark_potions - cart_item.quantity > 0:
                             cart.potion_quantity.update({item_sku: cart_item.quantity}) 
+    print(f"item {item_sku, cart_item} added to cart id {cart_id}")
     return "OK"
 
 
