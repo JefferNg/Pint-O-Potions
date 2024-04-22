@@ -150,16 +150,16 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
                         if potion == "GREEN_POTIONS_0":
                             total += cart.potion_quantity.get(potion)
                             result = connection.execute(sqlalchemy.text
-                            (f"UPDATE global_inventory SET num_green_potions = {row.num_green_potions - cart.quantity}"))
-                            result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {row.gold + cart.quantity * 50}"))
+                            (f"UPDATE global_inventory SET num_green_potions = {row.num_green_potions - cart.potion_quantity}"))
+                            result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {row.gold + cart.potion_quantity * 50}"))
                         if potion == "RED_POTIONS_0":
                             total += cart.potion_quantity.get(potion)
                             result = connection.execute(sqlalchemy.text
-                            (f"UPDATE global_inventory SET num_red_potions = {row.num_red_potions - cart.quantity}"))
-                            result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {row.gold + cart.quantity * 50}"))
+                            (f"UPDATE global_inventory SET num_red_potions = {row.num_red_potions - cart.potion_quantity}"))
+                            result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {row.gold + cart.potion_quantity * 50}"))
                         if potion == "BLUE_POTIONS_0":
                             total += cart.potion_quantity.get(potion)
                             result = connection.execute(sqlalchemy.text
-                            (f"UPDATE global_inventory SET num_blue_potions = {row.num_blue_potions - cart.quantity}"))
-                            result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {row.gold + cart.quantity * 50}"))
+                            (f"UPDATE global_inventory SET num_blue_potions = {row.num_blue_potions - cart.potion_quantity}"))
+                            result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {row.gold + cart.potion_quantity * 50}"))
     return {"total_potions_bought": total, "total_gold_paid": total * 50}
