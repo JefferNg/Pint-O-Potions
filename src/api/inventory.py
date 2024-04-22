@@ -32,11 +32,14 @@ def get_capacity_plan():
     Start with 1 capacity for 50 potions and 1 capacity for 10000 ml of potion. Each additional 
     capacity unit costs 1000 gold.
     """
+    capacity = {}
+    with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
+        for row in result:
+            capacity["potion_capacity"] = row.potion_capacity
+            capacity["ml_capacity"] = row.ml_capacity
 
-    return {
-        "potion_capacity": 50,
-        "ml_capacity": 10000
-        }
+    return capacity
 
 class CapacityPurchase(BaseModel):
     potion_capacity: int
@@ -49,7 +52,21 @@ def deliver_capacity_plan(capacity_purchase : CapacityPurchase, order_id: int):
     Start with 1 capacity for 50 potions and 1 capacity for 10000 ml of potion. Each additional 
     capacity unit costs 1000 gold.
     """
-    capacity_purchase.potion_capacity = 50
-    capacity_purchase.ml_capacity = 10000
+    with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
+        total_potions = 0
+        total_ml = 0
+        for row in result:
+            total_potions = row.num_red_potions + row.num_green_potions + row.num_blue_potions + row.num_dark_potions
+            total_ml = row.num_red_ml + row.num_green_ml + row.num_blue_ml + row.num_dark_ml
+            if total_potions > 50 or total_ml > 10000:
+                if row.gold - 1000 > 0:
+                    result = connection.execute(sqlalchemy.text
+                    (f"UPDATE global_inventory SET potion_capacity = {row.potion_capacity + capacity_purchase.potion_capacity}"))
+                    result = connection.execute(sqlalchemy.text
+                    (f"UPDATE global_inventory SET ml_capacity = {row.ml_capacity + capacity_purchase.ml_capacity}"))
+                    result = connection.execute(sqlalchemy.text
+                    (f"UPDATE global_inventory SET gold = {row.gold - 1000}"))
+
 
     return "OK"
