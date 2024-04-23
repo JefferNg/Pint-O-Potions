@@ -15,12 +15,14 @@ router = APIRouter(
 def get_inventory():
     """ """
     with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
+        inventory = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
+        potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory"))
         num = 0
         ml = 0
         gold = 0
-        for row in result:
-            num = row.num_green_potions + row.num_red_potions + row.num_blue_potions + row.num_dark_potions
+        for row in potions:
+            num += row.quantity
+        for row in inventory:
             ml = row.num_green_ml + row.num_red_ml + row.num_blue_ml + row.num_dark_ml
             gold = row.gold
     return {"number_of_potions": num, "ml_in_barrels": ml, "gold": gold}
@@ -61,11 +63,11 @@ def deliver_capacity_plan(capacity_purchase : CapacityPurchase, order_id: int):
             total_ml = row.num_red_ml + row.num_green_ml + row.num_blue_ml + row.num_dark_ml
             if total_potions > 50 or total_ml > 10000:
                 if row.gold - 1000 > 0:
-                    result = connection.execute(sqlalchemy.text
+                    connection.execute(sqlalchemy.text
                     (f"UPDATE global_inventory SET potion_capacity = {row.potion_capacity + capacity_purchase.potion_capacity}"))
-                    result = connection.execute(sqlalchemy.text
+                    connection.execute(sqlalchemy.text
                     (f"UPDATE global_inventory SET ml_capacity = {row.ml_capacity + capacity_purchase.ml_capacity}"))
-                    result = connection.execute(sqlalchemy.text
+                    connection.execute(sqlalchemy.text
                     (f"UPDATE global_inventory SET gold = {row.gold - 1000}"))
 
 
