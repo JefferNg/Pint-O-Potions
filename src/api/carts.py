@@ -126,16 +126,19 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
                     if item_sku == "GREEN_POTION":
                         if row.num_green_potions - cart_item.quantity > 0:
                             cart.potion_quantity.update({item_sku: cart_item.quantity})
+                            print(f"item {item_sku, cart_item} added to cart id {cart_id}")
                     if item_sku == "RED_POTION":
                         if row.num_red_potions - cart_item.quantity > 0:
                             cart.potion_quantity.update({item_sku: cart_item.quantity})
+                            print(f"item {item_sku, cart_item} added to cart id {cart_id}")
                     if item_sku == "BLUE_POTION":
                         if row.num_blue_potions - cart_item.quantity > 0:
                             cart.potion_quantity.update({item_sku: cart_item.quantity}) 
+                            print(f"item {item_sku, cart_item} added to cart id {cart_id}")
                     if item_sku == "DARK_POTION":
                         if row.num_dark_potions - cart_item.quantity > 0:
                             cart.potion_quantity.update({item_sku: cart_item.quantity}) 
-    print(f"item {item_sku, cart_item} added to cart id {cart_id}")
+                            print(f"item {item_sku, cart_item} added to cart id {cart_id}")
     return "OK"
 
 

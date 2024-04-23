@@ -81,9 +81,6 @@ def get_bottle_plan():
              "quantity": 0,
          }]
 
-    # red_mix = 0
-    # blue_mix = 0
-
     if green_ml >= 100:
         # bottle only green
         bottle_plan.append({
@@ -108,40 +105,47 @@ def get_bottle_plan():
             "potion_type": [0, 0, 0, 100],
             "quantity": 1,
         })
+
+    # if red_ml >= 50 and blue_ml >= 50:
+    #     # bottle purple
+    #     bottle_plan.append({
+    #         "potion_type": [50, 0, 50, 0],
+    #         "quantity": 1,
+    #     })
+
+    # if blue_ml >= 50 and dark_ml >= 50:
+    #     # bottle navy
+    #     bottle_plan.append({
+    #         "potion_type": [0, 0, 50, 50],
+    #         "quantity": 1,
+    #     })
+    
+    # if red_ml >= 50 and dark_ml >= 50:
+    #     # bottle maroon
+    #     bottle_plan.append({
+    #         "potion_type": [50, 0, 0, 50],
+    #         "quantity": 1,
+    #     })
+
+    # if green_ml >= 50 and dark_ml >= 50:
+    #     # bottle forest
+    #     bottle_plan.append({
+    #         "potion_type": [0, 50, 0, 50],
+    #         "quantity": 1,
+    #     })
+
+    # if red_ml >= 25 and green_ml >= 25 and blue_ml >= 25 and dark_ml >= 25:
+    #     # bottle useless
+    #     bottle_plan.append({
+    #         "potion_type": [25, 25, 25, 25],
+    #         "quantity": 1,
+    #     })
     
     if len(bottle_plan) > 1:
         # potions were mixed
         bottle_plan.pop(0)
 
     print(f"Current bottle plan: {bottle_plan}" )
-    ### VERSION 3:
-
-    # elif green_ml + red_ml + blue_ml < 100:
-    #     # do not bottle because not enough supplies
-    #     bottle_plan.append({
-    #         "potion_type": [0, 0, 0, 0],
-    #         "quantity": 0,
-    #     })
-    # else:
-    #     # mix green first, then red, then blue
-    #     total = green_ml
-    #     for i in range(1, red_ml):
-    #         if total + i > 100:
-    #             break
-    #         total += 1
-    #         red_mix += 1
-    #     for i in range(1, blue_ml):
-    #         if total + 1 > 100:
-    #             break
-    #         total += 1
-    #         blue_mix += 1
-        
-    #     bottle_plan.append({
-    #         "potion_type": [green_ml, red_mix, blue_mix, 0],
-    #         "quantity": 1,
-    #     })
-
-
 
     return bottle_plan
 
