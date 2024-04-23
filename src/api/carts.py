@@ -106,7 +106,7 @@ def create_cart(new_cart: Customer):
     cart_list = cart_dict.get("cart")
     cart_list.append(cart)
     cart_dict.update({"cart": cart_list})
-    print(f"cart created by {new_cart}")
+    print(f"Cart created by: {new_cart}")
     return {"cart_id": cart_num}
 
 
@@ -117,6 +117,7 @@ class CartItem(BaseModel):
 @router.post("/{cart_id}/items/{item_sku}")
 def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
     """ """
+    print(f"A customer wants to buy {cart_item.quantity, item_sku}")
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text("SELECT * FROM potion_inventory"))
         
