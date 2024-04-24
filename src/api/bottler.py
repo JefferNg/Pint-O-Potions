@@ -51,10 +51,6 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int
             elif potion.sku == "UNMARKED_POTION":
                 unmarked_potions = potion.quantity
         
-        # for potions in potions_delivered:
-        #     if potions.potion_type == [100,0,0,0]:
-        #         connection.execute(sqlalchemy.text
-        #             (f"UPDATE potion_inventory SET quantity = {potions.quantity + red_potions}, price = 70 WHERE type = array{potions.potion_type}"))
         for row in inventory:
             red_ml = row.num_red_ml
             green_ml = row.num_green_ml
@@ -63,58 +59,76 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int
             for potions in potions_delivered:
                 if potions.potion_type == [100,0,0,0]:
                     # update red bottle and ml count
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE potion_inventory SET quantity = {potions.quantity + red_potions} WHERE type = array{potions.potion_type}"))
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE global_inventory SET num_red_ml = {red_ml - potions.potion_type[0]}"))
+                    connection.execute(sqlalchemy.text
+                    ("UPDATE potion_inventory SET quantity = :quantity WHERE type = :type"),
+                    [{"quantity": potions.quantity + red_potions, "type": potions.potion_type}])
+                    connection.execute(sqlalchemy.text
+                    ("UPDATE global_inventory SET num_red_ml = :ml"),
+                    [{"ml": red_ml - potions.potion_type[0]}])
                 elif potions.potion_type == [0,100,0,0]:
                     # update green bottle and ml count
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE potion_inventory SET quantity = {potions.quantity + green_potions} WHERE type = array{potions.potion_type}"))
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE global_inventory SET num_green_ml = {green_ml - potions.potion_type[1]}"))
+                    connection.execute(sqlalchemy.text
+                    ("UPDATE potion_inventory SET quantity = :quantity WHERE type = :type"),
+                    [{"quantity": potions.quantity + green_potions, "type": potions.potion_type}])
+                    connection.execute(sqlalchemy.text
+                    ("UPDATE global_inventory SET num_green_ml = :ml"),
+                    [{"ml": green_ml - potions.potion_type[1]}])
                 elif potions.potion_type == [0,0,100,0]:
                     # update blue bottle and ml count
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE potion_inventory SET quantity = {potions.quantity + blue_potions} WHERE type = array{potions.potion_type}"))
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE global_inventory SET num_blue_ml = {blue_ml - potions.potion_type[2]}"))
+                    connection.execute(sqlalchemy.text
+                    ("UPDATE potion_inventory SET quantity = :quantity WHERE type = :type"),
+                    [{"quantity": potions.quantity + blue_potions, "type": potions.potion_type}])
+                    connection.execute(sqlalchemy.text
+                    ("UPDATE global_inventory SET num_blue_ml = :ml"),
+                    [{"ml": blue_ml - potions.potion_type[2]}])
                 elif potions.potion_type == [0,0,0,100]:
                     # update dark bottle and ml count
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE potion_inventory SET quantity = {potions.quantity + dark_potions} WHERE type = array{potions.potion_type}"))
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE global_inventory SET num_dark_ml = {dark_ml - potions.potion_type[3]}"))
+                    connection.execute(sqlalchemy.text
+                    ("UPDATE potion_inventory SET quantity = :quantity WHERE type = :type"),
+                    [{"quantity": potions.quantity + dark_potions, "type": potions.potion_type}])
+                    connection.execute(sqlalchemy.text
+                    ("UPDATE global_inventory SET num_dark_ml = :ml"),
+                    [{"ml": dark_ml - potions.potion_type[3]}])
                 elif potions.potion_type == [50,0,50,0]:
                     # update purple bottle and ml count
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE potion_inventory SET quantity = {potions.quantity + purple_potions} WHERE type = array{potions.potion_type}"))
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE global_inventory SET num_red_ml = {red_ml - potions.potion_type[0]}, num_blue_ml = {blue_ml - potions.potion_type[2]}"))
+                    connection.execute(sqlalchemy.text
+                    ("UPDATE potion_inventory SET quantity = :quantity WHERE type = :type"),
+                    [{"quantity": potions.quantity + purple_potions, "type": potions.potion_type}])
+                    connection.execute(sqlalchemy.text
+                    ("UPDATE global_inventory SET num_red_ml = :red_ml, num_blue_ml = :blue_ml"),
+                    [{"red_ml": red_ml - potions.potion_type[0], "blue_ml": blue_ml - potions.potion_type[2]}])
                 elif potions.potion_type == [0,50,0,50]:
                     # update forest bottle and ml count
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE potion_inventory SET quantity = {potions.quantity + forest_potions} WHERE type = array{potions.potion_type}"))
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE global_inventory SET num_green_ml = {green_ml - potions.potion_type[1]}, num_dark_ml = {dark_ml - potions.potion_type[3]}"))
+                    connection.execute(sqlalchemy.text
+                    ("UPDATE potion_inventory SET quantity = :quantity WHERE type = :type"),
+                    [{"quantity": potions.quantity + forest_potions, "type": potions.potion_type}])
+                    connection.execute(sqlalchemy.text
+                    ("UPDATE global_inventory SET num_green_ml = :green_ml, num_dark_ml = :dark_ml"),
+                    [{"green_ml": green_ml - potions.potion_type[1], "dark_ml": dark_ml - potions.potion_type[3]}])
                 elif potions.potion_type == [0,0,50,50]:
                     # update navy bottle and ml count
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE potion_inventory SET quantity = {potions.quantity + navy_potions} WHERE type = array{potions.potion_type}"))
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE global_inventory SET num_blue_ml = {blue_ml - potions.potion_type[2]}, num_dark_ml = {dark_ml - potions.potion_type[3]}"))
+                    connection.execute(sqlalchemy.text
+                    ("UPDATE potion_inventory SET quantity = :quantity WHERE type = :type"),
+                    [{"quantity": potions.quantity + navy_potions, "type": potions.potion_type}])
+                    connection.execute(sqlalchemy.text
+                    ("UPDATE global_inventory SET num_blue_ml = :blue_ml, num_dark_ml = :dark_ml"),
+                    [{"blue_ml": blue_ml - potions.potion_type[2], "dark_ml": dark_ml - potions.potion_type[3]}])
                 elif potions.potion_type == [50,0,0,50]:
                     # update maroon bottle and ml count
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE potion_inventory SET quantity = {potions.quantity + maroon_potions} WHERE type = array{potions.potion_type}"))
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE global_inventory SET num_red_ml = {red_ml - potions.potion_type[0]}, num_dark_ml = {dark_ml - potions.potion_type[3]}"))
+                    connection.execute(sqlalchemy.text
+                    ("UPDATE potion_inventory SET quantity = :quantity WHERE type = :type"),
+                    [{"quantity": potions.quantity + maroon_potions, "type": potions.potion_type}])
+                    connection.execute(sqlalchemy.text
+                    ("UPDATE global_inventory SET num_red_ml = :red_ml, num_dark_ml = :dark_ml"),
+                    [{"red_ml": red_ml - potions.potion_type[0], "dark_ml": dark_ml - potions.potion_type[3]}])
                 elif potions.potion_type == [25,25,25,25]:
                     # update unmarked bottle and ml count
+                    connection.execute(sqlalchemy.text
+                    ("UPDATE potion_inventory SET quantity = :quantity WHERE type = :type"),
+                    [{"quantity": potions.quantity + unmarked_potions, "type": potions.potion_type}])
                     result = connection.execute(sqlalchemy.text
-                    (f"UPDATE potion_inventory SET quantity = {potions.quantity + unmarked_potions} WHERE type = array{potions.potion_type}"))
-                    result = connection.execute(sqlalchemy.text
-                    (f"UPDATE global_inventory SET num_red_ml = {red_ml - potions.potion_type[0]}, num_green_ml = {green_ml - potions.potion_type[1]}, num_blue_ml = {blue_ml - potions.potion_type[2]}, num_dark_ml = {dark_ml - potions.potion_type[3]}"))
+                    ("UPDATE global_inventory SET num_red_ml = :red_ml, num_green_ml = :green_ml, num_blue_ml = :blue_ml, num_dark_ml = :dark_ml"),
+                    [{"red_ml": red_ml - potions.potion_type[0], "green_ml": green_ml - potions.potion_type[1], "blue_ml": blue_ml - potions.potion_type[2], "dark_ml": dark_ml - potions.potion_type[3]}])
                 else:
                     raise Exception("No Potion Mixed")
 

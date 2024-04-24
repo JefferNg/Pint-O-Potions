@@ -64,11 +64,8 @@ def deliver_capacity_plan(capacity_purchase : CapacityPurchase, order_id: int):
             if total_potions > 50 or total_ml > 10000:
                 if row.gold - 1000 > 0:
                     connection.execute(sqlalchemy.text
-                    (f"UPDATE global_inventory SET potion_capacity = {row.potion_capacity + capacity_purchase.potion_capacity}"))
-                    connection.execute(sqlalchemy.text
-                    (f"UPDATE global_inventory SET ml_capacity = {row.ml_capacity + capacity_purchase.ml_capacity}"))
-                    connection.execute(sqlalchemy.text
-                    (f"UPDATE global_inventory SET gold = {row.gold - 1000}"))
+                    ("UPDATE global_inventory SET potion_capacity = :pot_cap, ml_capacity = :ml_cap, gold = :gold"),
+                    [{"pot_cap": row.potion_capacity + capacity_purchase.potion_capacity, "ml_cap": row.ml_capacity + capacity_purchase.ml_capacity, "gold": row.gold - 1000}])
 
 
     return "OK"
