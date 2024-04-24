@@ -131,7 +131,7 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
             if cart.id == cart_id:
                 for row in result:
                     if item_sku == row.sku:
-                        if row.quantity - cart_item.quantity > 0:
+                        if row.quantity - cart_item.quantity >= 0:
                             # add potion to cart
                             connection.execute(sqlalchemy.text
                             ("INSERT INTO cart_items (cart_id, item_sku, quantity) VALUES (:cart_id, :item_sku, :quantity)"), 
