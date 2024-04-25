@@ -68,48 +68,49 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     barrel_plan = []
     for barrel in wholesale_catalog:
         # cycle through different barrels
+        num_possible_purchase = int(gold/barrel.price)
         if (barrel.potion_type == [1,0,0,0]):
-            if barrel.price <= gold:
+            if num_possible_purchase > 0:
                 barrel_plan.append(        {
                     "sku": barrel.sku,
                     "ml_per_barrel": barrel.ml_per_barrel,
                     "potion_type": barrel.potion_type,
                     "price": barrel.price,
-                    "quantity": 1,
+                    "quantity": num_possible_purchase,
                 })
-                gold -= barrel.price
+                gold -= barrel.price * num_possible_purchase
         elif (barrel.potion_type == [0,1,0,0]):
-            if barrel.price <= gold:
+            if num_possible_purchase > 0:
                 barrel_plan.append(        {
                     "sku": barrel.sku,
                     "ml_per_barrel": barrel.ml_per_barrel,
                     "potion_type": barrel.potion_type,
                     "price": barrel.price,
-                    "quantity": 1,
+                    "quantity": num_possible_purchase,
                 })
-                gold -= barrel.price
+                gold -= barrel.price * num_possible_purchase
         elif (barrel.potion_type == [0,0,1,0]):
-            if barrel.price <= gold:
+            if num_possible_purchase > 0:
                 barrel_plan.append(        {
                     "sku": barrel.sku,
                     "ml_per_barrel": barrel.ml_per_barrel,
                     "potion_type": barrel.potion_type,
                     "price": barrel.price,
-                    "quantity": 1,
+                    "quantity": num_possible_purchase,
                 })
-                gold -= barrel.price
+                gold -= barrel.price * num_possible_purchase
         elif (barrel.potion_type == [0,0,0,1]):
-            if barrel.price <= gold:
+            if num_possible_purchase > 0:
                 barrel_plan.append(        {
                     "sku": barrel.sku,
                     "ml_per_barrel": barrel.ml_per_barrel,
                     "potion_type": barrel.potion_type,
                     "price": barrel.price,
-                    "quantity": 1,
+                    "quantity": num_possible_purchase,
                 })
-                gold -= barrel.price
-        else:
-            raise Exception("Invalid Potion Type")
+                gold -= barrel.price * num_possible_purchase
+        # else:
+        #     raise Exception("Invalid Potion Type")
 
 
     return barrel_plan
