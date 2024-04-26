@@ -198,25 +198,25 @@ def get_bottle_plan():
             # bottle only green
             bottle_plan.append({
                 "potion_type": [0, 100, 0, 0],
-                "quantity": green_ml/100,
+                "quantity": int(green_ml/100),
             })
         if red_ml >= 100:
             # bottle only red
             bottle_plan.append({
                 "potion_type": [100, 0, 0, 0],
-                "quantity": red_ml/100,
+                "quantity": int(red_ml/100),
             })
         if blue_ml >= 100:
             # bottle only blue
             bottle_plan.append({
                 "potion_type": [0, 0, 100, 0],
-                "quantity": blue_ml/100,
+                "quantity": int(blue_ml/100),
             })
         if dark_ml >= 100:
             # bottle only dark
             bottle_plan.append({
                 "potion_type": [0, 0, 0, 100],
-                "quantity": dark_ml/100,
+                "quantity": int(dark_ml/100),
             })
 
     print(f"Current bottle plan: {bottle_plan}" )
