@@ -64,7 +64,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int
                     [{"quantity": potions.quantity + red_potions, "type": potions.potion_type}])
                     connection.execute(sqlalchemy.text
                     ("UPDATE global_inventory SET num_red_ml = :ml"),
-                    [{"ml": red_ml - potions.potion_type[0]}])
+                    [{"ml": red_ml - potions.potion_type[0] * potions.quantity}])
                 elif potions.potion_type == [0,100,0,0]:
                     # update green bottle and ml count
                     connection.execute(sqlalchemy.text
@@ -72,7 +72,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int
                     [{"quantity": potions.quantity + green_potions, "type": potions.potion_type}])
                     connection.execute(sqlalchemy.text
                     ("UPDATE global_inventory SET num_green_ml = :ml"),
-                    [{"ml": green_ml - potions.potion_type[1]}])
+                    [{"ml": green_ml - potions.potion_type[1] * potions.quantity}])
                 elif potions.potion_type == [0,0,100,0]:
                     # update blue bottle and ml count
                     connection.execute(sqlalchemy.text
@@ -80,7 +80,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int
                     [{"quantity": potions.quantity + blue_potions, "type": potions.potion_type}])
                     connection.execute(sqlalchemy.text
                     ("UPDATE global_inventory SET num_blue_ml = :ml"),
-                    [{"ml": blue_ml - potions.potion_type[2]}])
+                    [{"ml": blue_ml - potions.potion_type[2] * potions.quantity}])
                 elif potions.potion_type == [0,0,0,100]:
                     # update dark bottle and ml count
                     connection.execute(sqlalchemy.text
@@ -88,7 +88,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int
                     [{"quantity": potions.quantity + dark_potions, "type": potions.potion_type}])
                     connection.execute(sqlalchemy.text
                     ("UPDATE global_inventory SET num_dark_ml = :ml"),
-                    [{"ml": dark_ml - potions.potion_type[3]}])
+                    [{"ml": dark_ml - potions.potion_type[3] * potions.quantity}])
                 elif potions.potion_type == [50,0,50,0]:
                     # update purple bottle and ml count
                     connection.execute(sqlalchemy.text
