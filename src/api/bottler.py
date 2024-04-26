@@ -159,30 +159,6 @@ def get_bottle_plan():
 
         # bottle no potions if ml not sufficient
         bottle_plan = []
-        if green_ml >= 100:
-            # bottle only green
-            bottle_plan.append({
-                "potion_type": [0, 100, 0, 0],
-                "quantity": 1,
-            })
-        if red_ml >= 100:
-            # bottle only red
-            bottle_plan.append({
-                "potion_type": [100, 0, 0, 0],
-                "quantity": 1,
-            })
-        if blue_ml >= 100:
-            # bottle only blue
-            bottle_plan.append({
-                "potion_type": [0, 0, 100, 0],
-                "quantity": 1,
-            })
-        if dark_ml >= 100:
-            # bottle only dark
-            bottle_plan.append({
-                "potion_type": [0, 0, 0, 100],
-                "quantity": 1,
-            })
 
         if red_ml >= 50 and blue_ml >= 50:
             # bottle purple
@@ -217,6 +193,30 @@ def get_bottle_plan():
             bottle_plan.append({
                 "potion_type": [25, 25, 25, 25],
                 "quantity": 1,
+            })
+        if green_ml >= 100:
+            # bottle only green
+            bottle_plan.append({
+                "potion_type": [0, 100, 0, 0],
+                "quantity": green_ml/100,
+            })
+        if red_ml >= 100:
+            # bottle only red
+            bottle_plan.append({
+                "potion_type": [100, 0, 0, 0],
+                "quantity": red_ml/100,
+            })
+        if blue_ml >= 100:
+            # bottle only blue
+            bottle_plan.append({
+                "potion_type": [0, 0, 100, 0],
+                "quantity": blue_ml/100,
+            })
+        if dark_ml >= 100:
+            # bottle only dark
+            bottle_plan.append({
+                "potion_type": [0, 0, 0, 100],
+                "quantity": dark_ml/100,
             })
 
     print(f"Current bottle plan: {bottle_plan}" )
