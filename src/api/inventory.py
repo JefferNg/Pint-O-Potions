@@ -36,10 +36,14 @@ def get_capacity_plan():
     """
     capacity = {}
     with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
+        result = connection.execute(sqlalchemy.text("SELECT potion_capacity, ml_capacity, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM global_inventory"))
+        potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory"))
+        total_potions = 0
+        for potion in potions:
+            total_potions += potion.quantity
         for row in result:
-            capacity["potion_capacity"] = row.potion_capacity
-            capacity["ml_capacity"] = row.ml_capacity
+            capacity["potion_capacity"] = row.potion_capacity - total_potions
+            capacity["ml_capacity"] = row.ml_capacity - (row.num_red_ml + row.num_green_ml + row.num_blue_ml + row.num_dark_ml)
 
     return capacity
 
