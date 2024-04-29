@@ -32,6 +32,9 @@ def post_deliver_barrels(barrels_delivered: list[Barrel], order_id: int):
                         connection.execute(sqlalchemy.text
                         ("UPDATE global_inventory SET num_green_ml = :ml"), 
                         [{"ml": row.num_green_ml + (barrel.ml_per_barrel*barrel.quantity)}])
+                        # connection.execute(sqlalchemy.text
+                        # ("INSERT INTO shop_transactions (description) VALUES ('Shop paid Roxanne :paid for :purchase')"),
+                        # [{"paid": row.gold - barrel.price * barrel.quantity, "purchase": barrel.sku}])
                 elif barrel.potion_type == [1,0,0,0]:
                     if row.num_red_potions < 15:
                         connection.execute(sqlalchemy.text
@@ -49,7 +52,7 @@ def post_deliver_barrels(barrels_delivered: list[Barrel], order_id: int):
                         [{"ml": row.num_dark_ml + (barrel.ml_per_barrel*barrel.quantity)}])
                 connection.execute(sqlalchemy.text
                         ("UPDATE global_inventory SET gold = :gold"),
-                        [{"gold": row.gold - barrel.price}])
+                        [{"gold": row.gold - barrel.price * barrel.quantity}])
 
 
     return "OK"
