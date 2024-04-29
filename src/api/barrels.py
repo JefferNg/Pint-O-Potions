@@ -78,7 +78,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     "price": barrel.price,
                     "quantity": num_possible_purchase,
                 })
-                gold -= barrel.price * num_possible_purchase
+                #gold -= barrel.price * num_possible_purchase
         elif (barrel.potion_type == [0,1,0,0]):
             if num_possible_purchase > 0:
                 barrel_plan.append(        {
@@ -88,7 +88,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     "price": barrel.price,
                     "quantity": num_possible_purchase,
                 })
-                gold -= barrel.price * num_possible_purchase
+                #gold -= barrel.price * num_possible_purchase
         elif (barrel.potion_type == [0,0,1,0]):
             if num_possible_purchase > 0:
                 barrel_plan.append(        {
@@ -98,7 +98,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     "price": barrel.price,
                     "quantity": num_possible_purchase,
                 })
-                gold -= barrel.price * num_possible_purchase
+                #gold -= barrel.price * num_possible_purchase
         elif (barrel.potion_type == [0,0,0,1]):
             if num_possible_purchase > 0:
                 barrel_plan.append(        {
@@ -108,7 +108,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     "price": barrel.price,
                     "quantity": num_possible_purchase,
                 })
-                gold -= barrel.price * num_possible_purchase
+                #gold -= barrel.price * num_possible_purchase
         # else:
         #     raise Exception("Invalid Potion Type")
 
