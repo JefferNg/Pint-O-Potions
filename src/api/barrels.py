@@ -24,35 +24,47 @@ def post_deliver_barrels(barrels_delivered: list[Barrel], order_id: int):
     """ """
     print(f"barrels delievered: {barrels_delivered} order_id: {order_id}")
     with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
-        for row in result:
-            for barrel in barrels_delivered:
-                if barrel.potion_type == [0,1,0,0]:
-                    if row.num_green_potions < 10:
-                        connection.execute(sqlalchemy.text
-                        ("UPDATE global_inventory SET num_green_ml = :ml"), 
-                        [{"ml": row.num_green_ml + (barrel.ml_per_barrel*barrel.quantity)}])
-                        # connection.execute(sqlalchemy.text
-                        # ("INSERT INTO shop_transactions (description) VALUES ('Shop paid Roxanne :paid for :purchase')"),
-                        # [{"paid": row.gold - barrel.price * barrel.quantity, "purchase": barrel.sku}])
-                elif barrel.potion_type == [1,0,0,0]:
-                    if row.num_red_potions < 15:
-                        connection.execute(sqlalchemy.text
-                        ("UPDATE global_inventory SET num_red_ml = :ml"), 
-                        [{"ml": row.num_red_ml + (barrel.ml_per_barrel*barrel.quantity)}])
-                elif barrel.potion_type == [0,0,1,0]:
-                    if row.num_blue_potions < 5:
-                        connection.execute(sqlalchemy.text
-                        ("UPDATE global_inventory SET num_blue_ml = :ml"), 
-                        [{"ml": row.num_blue_ml + (barrel.ml_per_barrel*barrel.quantity)}])
-                elif barrel.potion_type == [0,0,0,1]:
-                    if row.num_dark_potions < 5:
-                        connection.execute(sqlalchemy.text
-                        ("UPDATE global_inventory SET num_dark_ml = :ml"), 
-                        [{"ml": row.num_dark_ml + (barrel.ml_per_barrel*barrel.quantity)}])
+        for barrel in barrels_delivered:
+            if barrel.potion_type == [0,1,0,0]:
+                tid = connection.execute(sqlalchemy.text
+                ("INSERT INTO shop_transactions (description) VALUES ('Shop paid Roxanne :paid for green barrel') RETURNING id"),
+                [{"paid": barrel.price * barrel.quantity}]).scalar_one()
                 connection.execute(sqlalchemy.text
-                        ("UPDATE global_inventory SET gold = :gold"),
-                        [{"gold": row.gold - barrel.price * barrel.quantity}])
+                ("INSERT INTO shop_ledger (gold_change, green_ml_change, customer_name, transaction_id) VALUES (:val, :ml, 'Shop', :tid)"),
+                [{"val": -barrel.price, "ml": barrel.ml_per_barrel, "tid": tid}])
+                connection.execute(sqlalchemy.text
+                ("INSERT INTO shop_ledger (gold_change, green_ml_change, customer_name, transaction_id) VALUES (:val, :ml, 'Roxanne', :tid)"),
+                [{"val": barrel.price, "ml": -barrel.ml_per_barrel, "tid": tid}])
+            elif barrel.potion_type == [1,0,0,0]:
+                tid = connection.execute(sqlalchemy.text
+                ("INSERT INTO shop_transactions (description) VALUES ('Shop paid Roxanne :paid for red barrel') RETURNING id"),
+                [{"paid": barrel.price * barrel.quantity}]).scalar_one()
+                connection.execute(sqlalchemy.text
+                ("INSERT INTO shop_ledger (gold_change, red_ml_change, customer_name, transaction_id) VALUES (:val, :ml, 'Shop', :tid)"),
+                [{"val": -barrel.price, "ml": barrel.ml_per_barrel, "tid": tid}])
+                connection.execute(sqlalchemy.text
+                ("INSERT INTO shop_ledger (gold_change, red_ml_change, customer_name, transaction_id) VALUES (:val, :ml, 'Roxanne', :tid)"),
+                [{"val": barrel.price, "ml": -barrel.ml_per_barrel, "tid": tid}])
+            elif barrel.potion_type == [0,0,1,0]:
+                tid = connection.execute(sqlalchemy.text
+                ("INSERT INTO shop_transactions (description) VALUES ('Shop paid Roxanne :paid for blue barrel') RETURNING id"),
+                [{"paid": barrel.price * barrel.quantity}]).scalar_one()
+                connection.execute(sqlalchemy.text
+                ("INSERT INTO shop_ledger (gold_change, blue_ml_change, customer_name, transaction_id) VALUES (:val, :ml, 'Shop', :tid)"),
+                [{"val": -barrel.price, "ml": barrel.ml_per_barrel, "tid": tid}])
+                connection.execute(sqlalchemy.text
+                ("INSERT INTO shop_ledger (gold_change, blue_ml_change, customer_name, transaction_id) VALUES (:val, :ml, 'Roxanne', :tid)"),
+                [{"val": barrel.price, "ml": -barrel.ml_per_barrel, "tid": tid}])
+            elif barrel.potion_type == [0,0,0,1]:
+                tid = connection.execute(sqlalchemy.text
+                ("INSERT INTO shop_transactions (description) VALUES ('Shop paid Roxanne :paid for dark barrel') RETURNING id"),
+                [{"paid": barrel.price * barrel.quantity}]).scalar_one()
+                connection.execute(sqlalchemy.text
+                ("INSERT INTO shop_ledger (gold_change, dark_ml_change, customer_name, transaction_id) VALUES (:val, :ml, 'Shop', :tid)"),
+                [{"val": -barrel.price, "ml": barrel.ml_per_barrel, "tid": tid}])
+                connection.execute(sqlalchemy.text
+                ("INSERT INTO shop_ledger (gold_change, dark_ml_change, customer_name, transaction_id) VALUES (:val, :ml, 'Roxanne', :tid)"),
+                [{"val": barrel.price, "ml": -barrel.ml_per_barrel, "tid": tid}])
 
 
     return "OK"
@@ -63,17 +75,27 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     """ """
     print(wholesale_catalog)
     with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
+        result = connection.execute(sqlalchemy.text("SELECT gold, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM global_inventory"))
+        ledger = connection.execute(sqlalchemy.text("SELECT SUM(gold_change) AS gold, SUM(red_ml_change) AS red_ml_change, SUM(green_ml_change) AS green_ml_change, SUM(blue_ml_change) AS blue_ml_change, SUM(dark_ml_change) AS dark_ml_change FROM shop_ledger WHERE customer_name = 'Shop'"))
         gold = 0
-        for row in result:
+        num_red_ml = 0
+        num_green_ml = 0
+        num_blue_ml = 0
+        num_dark_ml = 0
+        for row in ledger:
             gold = row.gold
+            num_red_ml = row.red_ml_change
+            num_green_ml = row.green_ml_change
+            num_blue_ml = row.blue_ml_change
+            num_dark_ml = row.dark_ml_change
 
     barrel_plan = []
     for barrel in wholesale_catalog:
         # cycle through different barrels
-        num_possible_purchase = int(gold/barrel.price)
+        num_possible_purchase = gold//barrel.price
+
         if (barrel.potion_type == [1,0,0,0]):
-            if num_possible_purchase > 0:
+            if num_possible_purchase > 0 and num_red_ml < 300:
                 barrel_plan.append(        {
                     "sku": barrel.sku,
                     "ml_per_barrel": barrel.ml_per_barrel,
@@ -81,9 +103,9 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     "price": barrel.price,
                     "quantity": num_possible_purchase,
                 })
-                #gold -= barrel.price * num_possible_purchase
+                gold -= barrel.price * num_possible_purchase
         elif (barrel.potion_type == [0,1,0,0]):
-            if num_possible_purchase > 0:
+            if num_possible_purchase > 0 and num_green_ml < 300:
                 barrel_plan.append(        {
                     "sku": barrel.sku,
                     "ml_per_barrel": barrel.ml_per_barrel,
@@ -91,9 +113,9 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     "price": barrel.price,
                     "quantity": num_possible_purchase,
                 })
-                #gold -= barrel.price * num_possible_purchase
+                gold -= barrel.price * num_possible_purchase
         elif (barrel.potion_type == [0,0,1,0]):
-            if num_possible_purchase > 0:
+            if num_possible_purchase > 0 and num_blue_ml < 300:
                 barrel_plan.append(        {
                     "sku": barrel.sku,
                     "ml_per_barrel": barrel.ml_per_barrel,
@@ -101,9 +123,9 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     "price": barrel.price,
                     "quantity": num_possible_purchase,
                 })
-                #gold -= barrel.price * num_possible_purchase
+                gold -= barrel.price * num_possible_purchase
         elif (barrel.potion_type == [0,0,0,1]):
-            if num_possible_purchase > 0:
+            if num_possible_purchase > 0 and num_dark_ml < 300:
                 barrel_plan.append(        {
                     "sku": barrel.sku,
                     "ml_per_barrel": barrel.ml_per_barrel,
@@ -111,10 +133,10 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     "price": barrel.price,
                     "quantity": num_possible_purchase,
                 })
-                #gold -= barrel.price * num_possible_purchase
+                gold -= barrel.price * num_possible_purchase
         # else:
         #     raise Exception("Invalid Potion Type")
-
+    print(f"Current barrel plan: {barrel_plan}")
 
     return barrel_plan
 
