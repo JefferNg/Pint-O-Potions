@@ -140,7 +140,7 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
             if cart.id == cart_id:
                 for row in result:
                     if item_sku == row.sku:
-                        total = connection.execute(sqlalchemy.text(f"SELECT SUM({row.sku.lower() + "_change"}) FROM shop_ledger WHERE customer_name = 'Shop'")).scalar_one()
+                        total = connection.execute(sqlalchemy.text(f"SELECT SUM({row.sku.lower() + '_change'}) FROM shop_ledger WHERE customer_name = 'Shop'")).scalar_one()
                         if total - cart_item.quantity >= 0:
                             # add potion to cart
                             connection.execute(sqlalchemy.text
