@@ -68,10 +68,10 @@ def get_inventory():
                 [{"red": ledge_dict["RED_ML"], "green": ledge_dict["GREEN_ML"], "blue": ledge_dict["BLUE_ML"], "dark": ledge_dict["DARK_ML"], "gold": ledge_dict["GOLD"]}])
             ml = ledge_dict["RED_ML"] + ledge_dict["GREEN_ML"] + ledge_dict["BLUE_ML"] + ledge_dict["DARK_ML"]
             gold = ledge_dict["GOLD"]
-        connection.execute(sqlalchemy.text("TRUNCATE shop_ledger CASCADE"))
-        connection.execute(sqlalchemy.text
-        ("INSERT INTO shop_ledger (gold_change, red_ml_change, green_ml_change, blue_ml_change, dark_ml_change, red_potion_change, green_potion_change, blue_potion_change, dark_potion_change, purple_potion_change, forest_potion_change, navy_potion_change, maroon_potion_change, unmarked_potion_change, customer_name) VALUES (:gold, :red_ml, :green_ml, :blue_ml, :dark_ml, :red_potion, :green_potion, :blue_potion, :dark_potion, :purple_potion, :forest_potion, :navy_potion, :maroon_potion, :unmarked_potion, 'Shop')"),
-        [{"gold": ledge_dict["GOLD"], "red_ml": ledge_dict["RED_ML"], "green_ml": ledge_dict["GREEN_ML"], "blue_ml": ledge_dict["BLUE_ML"], "dark_ml": ledge_dict["DARK_ML"], "red_potion": ledge_dict["RED_POTION"], "green_potion": ledge_dict["GREEN_POTION"], "blue_potion": ledge_dict["BLUE_POTION"], "dark_potion": ledge_dict["DARK_POTION"], "purple_potion": ledge_dict["PURPLE_POTION"], "forest_potion": ledge_dict["FOREST_POTION"], "navy_potion": ledge_dict["NAVY_POTION"], "maroon_potion": ledge_dict["MAROON_POTION"], "unmarked_potion": ledge_dict["UNMARKED_POTION"]}])
+        #connection.execute(sqlalchemy.text("TRUNCATE shop_ledger CASCADE"))
+        # connection.execute(sqlalchemy.text
+        # ("INSERT INTO shop_ledger (gold_change, red_ml_change, green_ml_change, blue_ml_change, dark_ml_change, red_potion_change, green_potion_change, blue_potion_change, dark_potion_change, purple_potion_change, forest_potion_change, navy_potion_change, maroon_potion_change, unmarked_potion_change, customer_name) VALUES (:gold, :red_ml, :green_ml, :blue_ml, :dark_ml, :red_potion, :green_potion, :blue_potion, :dark_potion, :purple_potion, :forest_potion, :navy_potion, :maroon_potion, :unmarked_potion, 'Shop')"),
+        # [{"gold": ledge_dict["GOLD"], "red_ml": ledge_dict["RED_ML"], "green_ml": ledge_dict["GREEN_ML"], "blue_ml": ledge_dict["BLUE_ML"], "dark_ml": ledge_dict["DARK_ML"], "red_potion": ledge_dict["RED_POTION"], "green_potion": ledge_dict["GREEN_POTION"], "blue_potion": ledge_dict["BLUE_POTION"], "dark_potion": ledge_dict["DARK_POTION"], "purple_potion": ledge_dict["PURPLE_POTION"], "forest_potion": ledge_dict["FOREST_POTION"], "navy_potion": ledge_dict["NAVY_POTION"], "maroon_potion": ledge_dict["MAROON_POTION"], "unmarked_potion": ledge_dict["UNMARKED_POTION"]}])
     return {"number_of_potions": num, "ml_in_barrels": ml, "gold": gold}
 
 # Gets called once a day
