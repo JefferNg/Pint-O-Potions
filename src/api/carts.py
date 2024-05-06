@@ -54,19 +54,52 @@ def search_orders(
     Your results must be paginated, the max results you can return at any
     time is 5 total line items.
     """
+    if sort_col is search_sort_options.customer_name:
+        order_by = db.table_view.c.customer_name
+    elif sort_col is search_sort_options.item_sku:
+        order_by = db.table_view.c.item_sku
+    elif sort_col is search_sort_options.line_item_total:
+        order_by = db.table_view.c.quantity
+    elif sort_col is search_sort_options.timestamp:
+        order_by = db.table_view.c.created_at
+    else:
+        assert False
+
+    selects = [db.table_view.c.id,
+            db.table_view.c.customer_name,
+            db.table_view.c.created_at]
+
+    if "red" in potion_sku.lower():
+        selects.append(db.table_view.c.red_potion_change)
+
+    stmt = (
+        sqlalchemy.select(
+            selects
+        )
+        .limit(5)
+        .offset(0)
+        .order_by(order_by, db.table_view.c.id)
+    )
+
+    if customer_name != "":
+        stmt = stmt.where(db.table_view.c.customer_name.ilike(f"%{customer_name}%"))
+    
+    with db.engine.connect() as connection:
+        result = connection.execute(stmt)
+        json = []
+        for row in result:
+            json.append({
+                "line_item_id": row.id,
+                "item_sku": row.item_sku,
+                "customer_name": row.customer_name,
+                "line_item_total": row.quantity,
+                "timestamp": row.created_at 
+            })
 
     return {
         "previous": "",
         "next": "",
-        "results": [
-            {
-                "line_item_id": 1,
-                "item_sku": potion_sku,
-                "customer_name": customer_name,
-                "line_item_total": 50,
-                "timestamp": "2021-01-01T00:00:00Z",
-            }
-        ],
+        "results": [],
     }
 
 
@@ -80,7 +113,7 @@ def post_visits(visit_id: int, customers: list[Customer]):
     """
     Which customers visited the shop today?
     """
-    print(f"A customer visited the shop! \n{customers}")
+    print(f"Customers visited the shop! \n{customers}")
     
     return "OK"
 
@@ -124,7 +157,8 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
     """ """
     print(f"A customer wants to buy {cart_item.quantity, item_sku}")
     with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text("SELECT sku, quantity FROM potion_inventory"))
+        #result = connection.execute(sqlalchemy.text("SELECT sku, quantity FROM potion_inventory"))
+        #ledger = connection.execute(sqlalchemy.text("SELECT SUM(red_potion_change) AS red_potion_change, SUM(green_potion_change) AS green_potion_change, SUM(blue_potion_change) AS blue_potion_change, SUM(dark_potion_change) AS dark_potion_change, SUM(purple_potion_change) AS purple_potion_change, SUM(forest_potion_change) AS forest_potion_change, SUM(navy_potion_change) AS navy_potion_change, SUM(maroon_potion_change) AS maroon_potion_change, SUM(unmarked_potion_change) AS unmarked_potion_change FROM shop_ledger WHERE customer_name = 'Shop' FOR UPDATE"))
         carts = connection.execute(sqlalchemy.text("SELECT id FROM carts"))
         
         for cart in carts:
@@ -135,7 +169,11 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
                     connection.execute(sqlalchemy.text
                     ("INSERT INTO cart_items (cart_id, item_sku, quantity) VALUES (:cart_id, :item_sku, :quantity)"), 
                     [{"cart_id": cart_id, "item_sku": sku_values.get(item_sku), "quantity": cart_item.quantity}])
+                    connection.execute(sqlalchemy.text
+                    (f"INSERT INTO shop_ledger ({item_sku.lower() + "_change"}, customer_name) VALUES (:val, 'Shop')"), [{"val": -cart_item.quantity}])
                     print(f"item {item_sku, cart_item} added to cart id {cart_id}")
+                else:
+                    raise Exception("Not enough potions in inventory")
     return "OK"
 
 
@@ -165,8 +203,9 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
                         # add new item to dictionary
                         list_of_items[item.item_sku] = item.quantity
                     # delete item from cart_item table once processed
+                    print(item.item_sku, item.quantity)
                     connection.execute(sqlalchemy.text
-                    ("DELETE FROM cart_items WHERE item_sku = :sku"), [{"sku": item.item_sku}])
+                    ("DELETE FROM cart_items WHERE item_sku = :sku AND cart_id = :id"), [{"sku": item.item_sku, "id": cart.id}])
                 
                 for row in result:
                     if row.id in list_of_items:
@@ -182,7 +221,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
                             (f"INSERT INTO shop_ledger ({row.sku.lower()}_change, gold_change, customer_name, transaction_id) VALUES (:quantity, :paid, :name, :tid)"),
                             [{"quantity": list_of_items.get(row.id), "paid": -row.price * list_of_items.get(row.id), "name": cart.customer, "tid": tid}])
                             connection.execute(sqlalchemy.text
-                            (f"INSERT INTO shop_ledger ({row.sku.lower()}_change, gold_change, customer_name, transaction_id) VALUES (:quantity, :paid, :name, :tid)"),
-                            [{"quantity": -list_of_items.get(row.id), "paid": row.price * list_of_items.get(row.id), "name": "Shop", "tid": tid}])
-        connection.execute(sqlalchemy.text("DELETE FROM carts WHERE id = :id"), [{"id": cart_id}])
+                            ("INSERT INTO shop_ledger (gold_change, customer_name, transaction_id) VALUES (:paid, :name, :tid)"),
+                            [{"paid": row.price * list_of_items.get(row.id), "name": "Shop", "tid": tid}])
+                connection.execute(sqlalchemy.text("DELETE FROM carts WHERE id = :id"), [{"id": cart_id}])
     return {"total_potions_bought": total, "total_gold_paid": paid}
