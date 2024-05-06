@@ -75,67 +75,46 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     """ """
     print(wholesale_catalog)
     with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text("SELECT gold, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM global_inventory"))
         ledger = connection.execute(sqlalchemy.text("SELECT SUM(gold_change) AS gold, SUM(red_ml_change) AS red_ml_change, SUM(green_ml_change) AS green_ml_change, SUM(blue_ml_change) AS blue_ml_change, SUM(dark_ml_change) AS dark_ml_change FROM shop_ledger WHERE customer_name = 'Shop'"))
         gold = 0
+        ml_inventory = {}
         num_red_ml = 0
         num_green_ml = 0
         num_blue_ml = 0
         num_dark_ml = 0
         for row in ledger:
             gold = row.gold
-            num_red_ml = row.red_ml_change
-            num_green_ml = row.green_ml_change
-            num_blue_ml = row.blue_ml_change
-            num_dark_ml = row.dark_ml_change
+            ml_inventory["red_ml"] = row.red_ml_change
+            ml_inventory["green_ml"] = row.green_ml_change
+            ml_inventory["blue_ml"] = row.blue_ml_change
+            ml_inventory["dark_ml"] = row.dark_ml_change
 
     barrel_plan = []
     for barrel in wholesale_catalog:
         # cycle through different barrels
         num_possible_purchase = gold//barrel.price
-
-        if (barrel.potion_type == [1,0,0,0]):
-            if num_possible_purchase > 0 and num_red_ml < 300:
-                barrel_plan.append(        {
-                    "sku": barrel.sku,
-                    "ml_per_barrel": barrel.ml_per_barrel,
-                    "potion_type": barrel.potion_type,
-                    "price": barrel.price,
-                    "quantity": num_possible_purchase,
-                })
-                gold -= barrel.price * num_possible_purchase
-        elif (barrel.potion_type == [0,1,0,0]):
-            if num_possible_purchase > 0 and num_green_ml < 300:
-                barrel_plan.append(        {
-                    "sku": barrel.sku,
-                    "ml_per_barrel": barrel.ml_per_barrel,
-                    "potion_type": barrel.potion_type,
-                    "price": barrel.price,
-                    "quantity": num_possible_purchase,
-                })
-                gold -= barrel.price * num_possible_purchase
-        elif (barrel.potion_type == [0,0,1,0]):
-            if num_possible_purchase > 0 and num_blue_ml < 300:
-                barrel_plan.append(        {
-                    "sku": barrel.sku,
-                    "ml_per_barrel": barrel.ml_per_barrel,
-                    "potion_type": barrel.potion_type,
-                    "price": barrel.price,
-                    "quantity": num_possible_purchase,
-                })
-                gold -= barrel.price * num_possible_purchase
-        elif (barrel.potion_type == [0,0,0,1]):
-            if num_possible_purchase > 0 and num_dark_ml < 300:
-                barrel_plan.append(        {
-                    "sku": barrel.sku,
-                    "ml_per_barrel": barrel.ml_per_barrel,
-                    "potion_type": barrel.potion_type,
-                    "price": barrel.price,
-                    "quantity": num_possible_purchase,
-                })
-                gold -= barrel.price * num_possible_purchase
-        # else:
-        #     raise Exception("Invalid Potion Type")
+        for ml in ml_inventory:
+            if num_possible_purchase > 0 and ml_inventory.get(ml) < 300:
+                # should buy max 5 barrels of each type
+                if num_possible_purchase < 5:
+                    barrel_plan.append({
+                        "sku": barrel.sku,
+                        "ml_per_barrel": barrel.ml_per_barrel,
+                        "potion_type": barrel.potion_type,
+                        "price": barrel.price,
+                        "quantity": num_possible_purchase
+                    })
+                    gold -= barrel.price * num_possible_purchase
+                else:
+                    barrel_plan.append({
+                        "sku": barrel.sku,
+                        "ml_per_barrel": barrel.ml_per_barrel,
+                        "potion_type": barrel.potion_type,
+                        "price": barrel.price,
+                        "quantity": 5
+                    })
+                    gold -= barrel.price * 5
+                break
     print(f"Current barrel plan: {barrel_plan}")
 
     return barrel_plan
