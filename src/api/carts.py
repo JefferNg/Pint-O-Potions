@@ -170,7 +170,7 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
                     ("INSERT INTO cart_items (cart_id, item_sku, quantity) VALUES (:cart_id, :item_sku, :quantity)"), 
                     [{"cart_id": cart_id, "item_sku": sku_values.get(item_sku), "quantity": cart_item.quantity}])
                     connection.execute(sqlalchemy.text
-                    (f"INSERT INTO shop_ledger ({item_sku.lower() + "_change"}, customer_name) VALUES (:val, 'Shop')"), [{"val": -cart_item.quantity}])
+                    (f"INSERT INTO shop_ledger ({item_sku.lower() + '_change'}, customer_name) VALUES (:val, 'Shop')"), [{"val": -cart_item.quantity}])
                     print(f"item {item_sku, cart_item} added to cart id {cart_id}")
                 else:
                     raise Exception("Not enough potions in inventory")
