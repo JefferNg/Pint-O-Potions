@@ -90,5 +90,6 @@ def get_catalog():
                         })
         if len(catalog) > 6:
             catalog = catalog[:6]
+        print(f"Catalog: {catalog}")
 
     return catalog
