@@ -96,7 +96,7 @@ def search_orders(
     return {
         "previous": "",
         "next": "",
-        "results": [json],
+        "results": json,
     }
 
 
