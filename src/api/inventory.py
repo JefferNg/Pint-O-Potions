@@ -83,14 +83,11 @@ def get_capacity_plan():
     """
     capacity = {}
     with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text("SELECT potion_capacity, ml_capacity, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml FROM global_inventory"))
-        potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory"))
-        total_potions = 0
-        for potion in potions:
-            total_potions += potion.quantity
-        for row in result:
-            capacity["potion_capacity"] = row.potion_capacity - total_potions
-            capacity["ml_capacity"] = row.ml_capacity - (row.num_red_ml + row.num_green_ml + row.num_blue_ml + row.num_dark_ml)
+        gold = connection.execute(sqlalchemy.text
+        ("SELECT SUM(gold_change) FROM shop_ledger WHERE customer_name = 'Shop'")).scalar_one()
+        if gold >= 1000:
+            capacity["potion_capacity"] = 50
+            capacity["ml_capacity"] = 10000
 
     return capacity
 
@@ -106,27 +103,16 @@ def deliver_capacity_plan(capacity_purchase : CapacityPurchase, order_id: int):
     capacity unit costs 1000 gold.
     """
     with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text("SELECT potion_capacity, ml_capacity, num_red_ml, num_green_ml, num_blue_ml, num_dark_ml, gold FROM global_inventory"))
-        potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory"))
-        total_potions = 0
-        total_ml = 0
-        for potion in potions:
-            total_potions += potion.quantity
+        result = connection.execute(sqlalchemy.text("SELECT potion_capacity, ml_capacity FROM global_inventory"))
         for row in result:
-            total_ml = row.num_red_ml + row.num_green_ml + row.num_blue_ml + row.num_dark_ml
-            if total_potions > 50 or total_ml > 10000:
-                if row.gold - 1000 > 0:
-                    connection.execute(sqlalchemy.text
-                    ("UPDATE global_inventory SET potion_capacity = :pot_cap, ml_capacity = :ml_cap"),
-                    [{"pot_cap": row.potion_capacity + capacity_purchase.potion_capacity, "ml_cap": row.ml_capacity + capacity_purchase.ml_capacity}])
-                    transaction = connection.execute(sqlalchemy.text
-                    ("INSERT INTO shop_transactions (description) VALUES ('Shop paid 1000 to increase inventory capacity') RETURNING id"))
-                    tid = 0
-                    for t in transaction:
-                        tid = t.id
-                    connection.execute(sqlalchemy.text
-                    ("INSERT INTO shop_ledger (gold_change, customer_name, transaction_id) VALUES (-1000, 'Shop', :tid)"),
-                    [{"tid": tid}])
+            connection.execute(sqlalchemy.text
+            ("UPDATE global_inventory SET potion_capacity = :pot_cap, ml_capacity = :ml_cap"),
+            [{"pot_cap": row.potion_capacity + capacity_purchase.potion_capacity, "ml_cap": row.ml_capacity + capacity_purchase.ml_capacity}])
+            tid = connection.execute(sqlalchemy.text
+            ("INSERT INTO shop_transactions (description) VALUES ('Shop paid 1000 to increase inventory capacity') RETURNING id")).scalar_one()
+            connection.execute(sqlalchemy.text
+            ("INSERT INTO shop_ledger (gold_change, customer_name, transaction_id) VALUES (-1000, 'Shop', :tid)"),
+            [{"tid": tid}])
 
 
     return "OK"
