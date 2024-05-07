@@ -27,7 +27,7 @@ def get_catalog():
                 if row.sku == "GREEN_POTION" and quantity.green_potion_change > 0:
                     catalog.append(            {
                             "sku": row.sku,
-                            "name": "Leap",
+                            "name": "Leaping",
                             "quantity": quantity.green_potion_change,
                             "price": row.price,
                             "potion_type": row.type,
@@ -51,7 +51,7 @@ def get_catalog():
                 if row.sku == "PURPLE_POTION" and quantity.purple_potion_change > 0:
                     catalog.append(            {
                             "sku": row.sku,
-                            "name": "Teleportation",
+                            "name": "Water Breathing",
                             "quantity": quantity.purple_potion_change,
                             "price": row.price,
                             "potion_type": row.type,

@@ -23,6 +23,7 @@ def reset():
         connection.execute(sqlalchemy.text("TRUNCATE cart_items CASCADE"))
         connection.execute(sqlalchemy.text("TRUNCATE shop_ledger CASCADE"))
         connection.execute(sqlalchemy.text("TRUNCATE shop_transactions CASCADE"))
+        connection.execute(sqlalchemy.text("TRUNCATE potion_history CASCADE"))
         connection.execute(sqlalchemy.text("INSERT INTO shop_ledger (gold_change, customer_name) VALUES (100, 'Shop')"))
 
     return "OK"
