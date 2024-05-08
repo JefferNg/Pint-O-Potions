@@ -65,6 +65,7 @@ def post_deliver_barrels(barrels_delivered: list[Barrel], order_id: int):
                 connection.execute(sqlalchemy.text
                 ("INSERT INTO shop_ledger (gold_change, dark_ml_change, customer_name, transaction_id) VALUES (:val, :ml, 'Roxanne', :tid)"),
                 [{"val": barrel.price * barrel.quantity, "ml": -barrel.ml_per_barrel * barrel.quantity, "tid": tid}])
+            print(barrel.sku)
 
 
     return "OK"
@@ -100,30 +101,31 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         num_possible_purchase = gold//barrel.price
         for ml in ml_inventory:
             if num_possible_purchase > 0 and ml_inventory.get(ml) < 300:
-                # should buy max 5 barrels of each type
-                if num_possible_purchase < MAX and num_possible_purchase * barrel.ml_per_barrel + total_ml <= capacity:
-                    # number of barrels purchased should not exceed ml capacity
-                    barrel_plan.append({
-                        "sku": barrel.sku,
-                        "ml_per_barrel": barrel.ml_per_barrel,
-                        "potion_type": barrel.potion_type,
-                        "price": barrel.price,
-                        "quantity": num_possible_purchase
-                    })
-                    gold -= barrel.price * num_possible_purchase
-                    total_ml += num_possible_purchase * barrel.ml_per_barrel
-                elif total_ml + MAX * barrel.ml_per_barrel <= capacity:
-                    # max barrels purchased should not exceed ml capacity
-                    barrel_plan.append({
-                        "sku": barrel.sku,
-                        "ml_per_barrel": barrel.ml_per_barrel,
-                        "potion_type": barrel.potion_type,
-                        "price": barrel.price,
-                        "quantity": MAX
-                    })
-                    gold -= barrel.price * MAX
-                    total_ml += MAX * barrel.ml_per_barrel
-                break
+                if num_possible_purchase <= barrel.quantity:
+                    # should buy max 5 barrels of each type
+                    if num_possible_purchase < MAX and num_possible_purchase * barrel.ml_per_barrel + total_ml <= capacity:
+                        # number of barrels purchased should not exceed ml capacity
+                        barrel_plan.append({
+                            "sku": barrel.sku,
+                            "ml_per_barrel": barrel.ml_per_barrel,
+                            "potion_type": barrel.potion_type,
+                            "price": barrel.price,
+                            "quantity": num_possible_purchase
+                        })
+                        gold -= barrel.price * num_possible_purchase
+                        total_ml += num_possible_purchase * barrel.ml_per_barrel
+                    elif total_ml + MAX * barrel.ml_per_barrel <= capacity:
+                        # max barrels purchased should not exceed ml capacity
+                        barrel_plan.append({
+                            "sku": barrel.sku,
+                            "ml_per_barrel": barrel.ml_per_barrel,
+                            "potion_type": barrel.potion_type,
+                            "price": barrel.price,
+                            "quantity": MAX
+                        })
+                        gold -= barrel.price * MAX
+                        total_ml += MAX * barrel.ml_per_barrel
+                    break
     print(f"Current barrel plan: {barrel_plan}")
 
     return barrel_plan
