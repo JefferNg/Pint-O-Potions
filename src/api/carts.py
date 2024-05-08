@@ -75,6 +75,8 @@ def search_orders(
         previous_page = current_page - 1
         next_page = current_page + 1
         offset = current_page * 5
+    if previous_page < 0:
+            previous_page = 0
 
     stmt = (
         sqlalchemy.select(
