@@ -65,6 +65,17 @@ def search_orders(
     else:
         assert False
 
+    current_page = 0
+    offset = 0
+    if search_page == "":
+        previous_page = current_page - 1
+        next_page = current_page + 1
+    else:
+        current_page = int(search_page)
+        previous_page = current_page - 1
+        next_page = current_page + 1
+        offset = current_page * 5
+
     stmt = (
         sqlalchemy.select(
             db.table_view.c.id,
@@ -74,12 +85,15 @@ def search_orders(
             db.table_view.c.created_at
         )
         .limit(5)
-        .offset(0)
+        .offset(offset)
         .order_by(order_by, db.table_view.c.id)
     )
 
     if customer_name != "":
         stmt = stmt.where(db.table_view.c.customer_name.ilike(f"%{customer_name}%"))
+
+    if potion_sku != "":
+        stmt = stmt.where(db.table_view.c.sku.ilike(f"%{potion_sku}%"))
     
     with db.engine.connect() as connection:
         result = connection.execute(stmt)
@@ -94,8 +108,8 @@ def search_orders(
             })
 
     return {
-        "previous": "",
-        "next": "",
+        "previous": str(previous_page),
+        "next": str(next_page),
         "results": json,
     }
 
