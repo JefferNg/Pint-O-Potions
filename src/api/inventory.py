@@ -82,12 +82,12 @@ def get_capacity_plan():
     capacity unit costs 1000 gold.
     """
     capacity = {}
-    with db.engine.begin() as connection:
-        gold = connection.execute(sqlalchemy.text
-        ("SELECT SUM(gold_change) FROM shop_ledger WHERE customer_name = 'Shop'")).scalar_one()
-        if gold >= 1000:
-            capacity["potion_capacity"] = 1
-            capacity["ml_capacity"] = 1
+    # with db.engine.begin() as connection:
+    #     gold = connection.execute(sqlalchemy.text
+    #     ("SELECT SUM(gold_change) FROM shop_ledger WHERE customer_name = 'Shop'")).scalar_one()
+    #     if gold >= 1000:
+    #         capacity["potion_capacity"] = 1
+    #         capacity["ml_capacity"] = 1
 
     return capacity
 
