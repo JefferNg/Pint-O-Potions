@@ -75,7 +75,7 @@ def post_deliver_barrels(barrels_delivered: list[Barrel], order_id: int):
 def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     """ """
     print(wholesale_catalog)
-    MAX = 5
+    MAX = 10
     with db.engine.begin() as connection:
         capacity = connection.execute(sqlalchemy.text("SELECT ml_capacity FROM global_inventory")).scalar_one()
         ledger = connection.execute(sqlalchemy.text
@@ -100,9 +100,10 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         # cycle through different barrels
         num_possible_purchase = gold//barrel.price
         for ml in ml_inventory:
-            if num_possible_purchase > 0 and ml_inventory.get(ml) < 300:
+            if num_possible_purchase > 0 and ml_inventory.get(ml) < 1000:
+                # buy barrel based on demand
                 if num_possible_purchase <= barrel.quantity:
-                    # should buy max 5 barrels of each type
+                    # should buy max 10 barrels of each type
                     if num_possible_purchase < MAX and num_possible_purchase * barrel.ml_per_barrel + total_ml <= capacity:
                         # number of barrels purchased should not exceed ml capacity
                         barrel_plan.append({
@@ -126,6 +127,19 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                         gold -= barrel.price * MAX
                         total_ml += MAX * barrel.ml_per_barrel
                     break
+                elif "large" in barrel.sku.lower():
+                    # buy based on sku
+                    barrel_plan.append({
+                            "sku": barrel.sku,
+                            "ml_per_barrel": barrel.ml_per_barrel,
+                            "potion_type": barrel.potion_type,
+                            "price": barrel.price,
+                            "quantity": barrel.quantity
+                        })
+                    gold -= barrel.price * barrel.quantity
+                    total_ml += barrel.quantity * barrel.ml_per_barrel
+                    break
+
     print(f"Current barrel plan: {barrel_plan}")
 
     return barrel_plan
