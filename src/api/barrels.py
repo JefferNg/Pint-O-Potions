@@ -129,15 +129,27 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     break
                 elif "large" in barrel.sku.lower():
                     # buy based on sku
-                    barrel_plan.append({
-                            "sku": barrel.sku,
-                            "ml_per_barrel": barrel.ml_per_barrel,
-                            "potion_type": barrel.potion_type,
-                            "price": barrel.price,
-                            "quantity": barrel.quantity
-                        })
-                    gold -= barrel.price * barrel.quantity
-                    total_ml += barrel.quantity * barrel.ml_per_barrel
+                    remaining_ml = capacity - total_ml
+                    if total_ml + barrel.ml_per_barrel * barrel.quantity <= capacity:
+                        barrel_plan.append({
+                                "sku": barrel.sku,
+                                "ml_per_barrel": barrel.ml_per_barrel,
+                                "potion_type": barrel.potion_type,
+                                "price": barrel.price,
+                                "quantity": barrel.quantity
+                            })
+                        gold -= barrel.price * barrel.quantity
+                        total_ml += barrel.quantity * barrel.ml_per_barrel
+                    elif remaining_ml // barrel.ml_per_barrel > 0:
+                        barrel_plan.append({
+                                "sku": barrel.sku,
+                                "ml_per_barrel": barrel.ml_per_barrel,
+                                "potion_type": barrel.potion_type,
+                                "price": barrel.price,
+                                "quantity": remaining_ml // barrel.ml_per_barrel
+                            })
+                        gold -= barrel.price * remaining_ml // barrel.ml_per_barrel
+                        total_ml += remaining_ml // barrel.ml_per_barrel * barrel.ml_per_barrel
                     break
 
     print(f"Current barrel plan: {barrel_plan}")
