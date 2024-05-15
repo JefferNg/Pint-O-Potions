@@ -76,6 +76,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     """ """
     print(wholesale_catalog)
     MAX = 10
+    LIMITER = 2
     with db.engine.begin() as connection:
         capacity = connection.execute(sqlalchemy.text("SELECT ml_capacity FROM global_inventory")).scalar_one()
         ledger = connection.execute(sqlalchemy.text
@@ -136,10 +137,10 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                                 "ml_per_barrel": barrel.ml_per_barrel,
                                 "potion_type": barrel.potion_type,
                                 "price": barrel.price,
-                                "quantity": barrel.quantity
+                                "quantity": barrel.quantity // LIMITER
                             })
-                        gold -= barrel.price * barrel.quantity
-                        total_ml += barrel.quantity * barrel.ml_per_barrel
+                        gold -= barrel.price * barrel.quantity // LIMITER
+                        total_ml += barrel.quantity // LIMITER * barrel.ml_per_barrel
                     elif remaining_ml // barrel.ml_per_barrel > 0:
                         barrel_plan.append({
                                 "sku": barrel.sku,
