@@ -60,7 +60,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int
                     [{"ml": -potions.potion_type[2] * potions.quantity, "potion": potions.quantity}])
                 elif potions.potion_type == [0,0,0,100]:
                     connection.execute(sqlalchemy.text
-                    ("INSERT INTO shop_ledger (dark_ml_change, dark_potion_change, customer_name) VALUES (:ml, :potion. 'Shop')"),
+                    ("INSERT INTO shop_ledger (dark_ml_change, dark_potion_change, customer_name) VALUES (:ml, :potion, 'Shop')"),
                     [{"ml": -potions.potion_type[3] * potions.quantity, "potion": potions.quantity}])
                 elif potions.potion_type == [50,0,50,0]:
                     connection.execute(sqlalchemy.text
