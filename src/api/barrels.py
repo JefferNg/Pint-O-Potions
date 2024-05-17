@@ -128,7 +128,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                         gold -= barrel.price * MAX
                         total_ml += MAX * barrel.ml_per_barrel
                     break
-                elif "large" in barrel.sku.lower():
+                elif "large" in barrel.sku.lower() or "medium" in barrel.sku.lower():
                     # buy based on sku
                     remaining_ml = capacity - total_ml
                     if total_ml + barrel.ml_per_barrel * barrel.quantity <= capacity:
