@@ -88,8 +88,8 @@ def get_capacity_plan():
     with db.engine.begin() as connection:
         gold = connection.execute(sqlalchemy.text
         ("SELECT SUM(gold_change) FROM shop_ledger WHERE customer_name = 'Shop'")).scalar_one()
-        if gold >= 2000:
-            capacity["potion_capacity"] = 1
+        if gold >= 1000:
+            capacity["potion_capacity"] = 0
             capacity["ml_capacity"] = 1
 
     return capacity
@@ -109,12 +109,12 @@ def deliver_capacity_plan(capacity_purchase : CapacityPurchase, order_id: int):
         result = connection.execute(sqlalchemy.text("SELECT potion_capacity, ml_capacity FROM global_inventory"))
         for row in result:
             connection.execute(sqlalchemy.text
-            ("UPDATE global_inventory SET potion_capacity = :pot_cap, ml_capacity = :ml_cap"),
-            [{"pot_cap": row.potion_capacity + capacity_purchase.potion_capacity * 50, "ml_cap": row.ml_capacity + capacity_purchase.ml_capacity * 10000}])
+            ("UPDATE global_inventory SET ml_capacity = :ml_cap"),
+            [{"ml_cap": row.ml_capacity + capacity_purchase.ml_capacity * 10000}])
             tid = connection.execute(sqlalchemy.text
-            ("INSERT INTO shop_transactions (description) VALUES ('Shop paid 2000 to increase inventory capacity') RETURNING id")).scalar_one()
+            ("INSERT INTO shop_transactions (description) VALUES ('Shop paid 1000 to increase ml capacity') RETURNING id")).scalar_one()
             connection.execute(sqlalchemy.text
-            ("INSERT INTO shop_ledger (gold_change, customer_name, transaction_id) VALUES (-2000, 'Shop', :tid)"),
+            ("INSERT INTO shop_ledger (gold_change, customer_name, transaction_id) VALUES (-1000, 'Shop', :tid)"),
             [{"tid": tid}])
 
 
