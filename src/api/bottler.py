@@ -98,7 +98,7 @@ def get_bottle_plan():
     # Expressed in integers from 1 to 100 that must sum up to 100.
 
     # Initial logic: bottle all barrels into red potions.
-    MAX = 40
+    MAX = 60
     with db.engine.begin() as connection:
         capacity = connection.execute(sqlalchemy.text("SELECT potion_capacity FROM global_inventory")).scalar_one()
         ledger = connection.execute(sqlalchemy.text
