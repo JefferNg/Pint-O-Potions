@@ -137,156 +137,156 @@ def get_bottle_plan():
         bottle_plan = []
 
         if total_potions < capacity:
-            # if red_ml >= 50 and blue_ml >= 50 and purple_potion < MAX:
-            #     # bottle purple
-            #     total = min(red_ml // 50, blue_ml // 50)
-            #     if  total < MAX and total + total_potions <= capacity:
-            #         # bottle as many as possible without going over the max and capacity
-            #         bottle_plan.append({
-            #             "potion_type": [50, 0, 50, 0],
-            #             "quantity": total,
-            #         })
-            #         red_ml -= 50 * total
-            #         blue_ml -= 50 * total
-            #         total_potions += total
-            #     elif total_potions + MAX <= capacity:
-            #         # bottle the max since given ml can make more
-            #         bottle_plan.append({
-            #             "potion_type": [50, 0, 50, 0],
-            #             "quantity": MAX,
-            #         })
-            #         red_ml -= 50 * MAX
-            #         blue_ml -= 50 * MAX
-            #         total_potions += MAX
-            #     elif capacity - total_potions > 0 and capacity - total_potions < total:
-            #         # bottle to fill capacity without over bottling
-            #         bottle_plan.append({
-            #             "potion_type": [50, 0, 50, 0],
-            #             "quantity": capacity - total_potions,
-            #         })
-            #         red_ml -= 50 * (capacity - total_potions)
-            #         blue_ml -= 50 * (capacity - total_potions)
-            #         total_potions += (capacity - total_potions)
+            if red_ml >= 50 and blue_ml >= 50 and purple_potion < MAX:
+                # bottle purple
+                total = min(red_ml // 50, blue_ml // 50)
+                if  total < MAX and total + total_potions <= capacity:
+                    # bottle as many as possible without going over the max and capacity
+                    bottle_plan.append({
+                        "potion_type": [50, 0, 50, 0],
+                        "quantity": total,
+                    })
+                    red_ml -= 50 * total
+                    blue_ml -= 50 * total
+                    total_potions += total
+                elif total_potions + MAX <= capacity:
+                    # bottle the max since given ml can make more
+                    bottle_plan.append({
+                        "potion_type": [50, 0, 50, 0],
+                        "quantity": MAX,
+                    })
+                    red_ml -= 50 * MAX
+                    blue_ml -= 50 * MAX
+                    total_potions += MAX
+                elif capacity - total_potions > 0 and capacity - total_potions < total:
+                    # bottle to fill capacity without over bottling
+                    bottle_plan.append({
+                        "potion_type": [50, 0, 50, 0],
+                        "quantity": capacity - total_potions,
+                    })
+                    red_ml -= 50 * (capacity - total_potions)
+                    blue_ml -= 50 * (capacity - total_potions)
+                    total_potions += (capacity - total_potions)
                 
 
-            # if blue_ml >= 50 and dark_ml >= 50 and navy_potion < MAX:
-            #     # bottle navy
-            #     total = min(blue_ml // 50, dark_ml // 50)
-            #     if total < MAX and total + total_potions <= capacity: 
-            #         bottle_plan.append({
-            #             "potion_type": [0, 0, 50, 50],
-            #             "quantity": total,
-            #         })
-            #         blue_ml -= 50 * total
-            #         dark_ml -= 50 * total
-            #         total_potions += total
-            #     elif total_potions + MAX <= capacity:
-            #         bottle_plan.append({
-            #             "potion_type": [0, 0, 50, 50],
-            #             "quantity": MAX,
-            #         })
-            #         blue_ml -= 50 * MAX
-            #         dark_ml -= 50 * MAX
-            #         total_potions += MAX
-            #     elif capacity - total_potions > 0 and capacity - total_potions < total:
-            #         bottle_plan.append({
-            #             "potion_type": [0, 0, 50, 50],
-            #             "quantity": capacity - total_potions,
-            #         })
-            #         blue_ml -= 50 * (capacity - total_potions)
-            #         dark_ml -= 50 * (capacity - total_potions)
-            #         total_potions += (capacity - total_potions)
+            if blue_ml >= 50 and dark_ml >= 50 and navy_potion < MAX:
+                # bottle navy
+                total = min(blue_ml // 50, dark_ml // 50)
+                if total < MAX and total + total_potions <= capacity: 
+                    bottle_plan.append({
+                        "potion_type": [0, 0, 50, 50],
+                        "quantity": total,
+                    })
+                    blue_ml -= 50 * total
+                    dark_ml -= 50 * total
+                    total_potions += total
+                elif total_potions + MAX <= capacity:
+                    bottle_plan.append({
+                        "potion_type": [0, 0, 50, 50],
+                        "quantity": MAX,
+                    })
+                    blue_ml -= 50 * MAX
+                    dark_ml -= 50 * MAX
+                    total_potions += MAX
+                elif capacity - total_potions > 0 and capacity - total_potions < total:
+                    bottle_plan.append({
+                        "potion_type": [0, 0, 50, 50],
+                        "quantity": capacity - total_potions,
+                    })
+                    blue_ml -= 50 * (capacity - total_potions)
+                    dark_ml -= 50 * (capacity - total_potions)
+                    total_potions += (capacity - total_potions)
                 
             
-            # if red_ml >= 50 and dark_ml >= 50 and maroon_potion < MAX:
-            #     # bottle maroon
-            #     total = min(red_ml // 50, dark_ml // 50)
-            #     if total < MAX and total + total_potions <= capacity:
-            #         bottle_plan.append({
-            #             "potion_type": [50, 0, 0, 50],
-            #             "quantity": total,
-            #         })
-            #         red_ml -= 50 * total
-            #         dark_ml -= 50 * total
-            #         total_potions += total
-            #     elif total_potions + MAX <= capacity:
-            #         bottle_plan.append({
-            #             "potion_type": [50, 0, 0, 50],
-            #             "quantity": MAX,
-            #         })
-            #         red_ml -= 50 * MAX
-            #         dark_ml -= 50 * MAX
-            #         total_potions += MAX
-            #     elif capacity - total_potions > 0 and capacity - total_potions < total:
-            #         bottle_plan.append({
-            #             "potion_type": [50, 0, 0, 50],
-            #             "quantity": capacity - total_potions,
-            #         })
-            #         red_ml -= 50 * (capacity - total_potions)
-            #         dark_ml -= 50 * (capacity - total_potions)
-            #         total_potions += (capacity - total_potions)
+            if red_ml >= 50 and dark_ml >= 50 and maroon_potion < MAX:
+                # bottle maroon
+                total = min(red_ml // 50, dark_ml // 50)
+                if total < MAX and total + total_potions <= capacity:
+                    bottle_plan.append({
+                        "potion_type": [50, 0, 0, 50],
+                        "quantity": total,
+                    })
+                    red_ml -= 50 * total
+                    dark_ml -= 50 * total
+                    total_potions += total
+                elif total_potions + MAX <= capacity:
+                    bottle_plan.append({
+                        "potion_type": [50, 0, 0, 50],
+                        "quantity": MAX,
+                    })
+                    red_ml -= 50 * MAX
+                    dark_ml -= 50 * MAX
+                    total_potions += MAX
+                elif capacity - total_potions > 0 and capacity - total_potions < total:
+                    bottle_plan.append({
+                        "potion_type": [50, 0, 0, 50],
+                        "quantity": capacity - total_potions,
+                    })
+                    red_ml -= 50 * (capacity - total_potions)
+                    dark_ml -= 50 * (capacity - total_potions)
+                    total_potions += (capacity - total_potions)
 
-            # if green_ml >= 50 and dark_ml >= 50 and forest_potion < MAX:
-            #     # bottle forest
-            #     total = min(green_ml // 50, dark_ml // 50)
-            #     if total < MAX and total + total_potions <= capacity:
-            #         bottle_plan.append({
-            #             "potion_type": [0, 50, 0, 50],
-            #             "quantity": total,
-            #         })
-            #         green_ml -= 50 * total
-            #         dark_ml -= 50 * total
-            #         total_potions += total
-            #     elif total_potions + MAX <= capacity:
-            #         bottle_plan.append({
-            #             "potion_type": [0, 50, 0, 50],
-            #             "quantity": MAX,
-            #         })
-            #         green_ml -= 50 * MAX
-            #         dark_ml -= 50 * MAX
-            #         total_potions += MAX
-            #     elif capacity - total_potions > 0 and capacity - total_potions < total:
-            #         bottle_plan.append({
-            #             "potion_type": [0, 50, 0, 50],
-            #             "quantity": capacity - total_potions,
-            #         })
-            #         green_ml -= 50 * (capacity - total_potions)
-            #         dark_ml -= 50 * (capacity - total_potions)
-            #         total_potions += (capacity - total_potions)
+            if green_ml >= 50 and dark_ml >= 50 and forest_potion < MAX:
+                # bottle forest
+                total = min(green_ml // 50, dark_ml // 50)
+                if total < MAX and total + total_potions <= capacity:
+                    bottle_plan.append({
+                        "potion_type": [0, 50, 0, 50],
+                        "quantity": total,
+                    })
+                    green_ml -= 50 * total
+                    dark_ml -= 50 * total
+                    total_potions += total
+                elif total_potions + MAX <= capacity:
+                    bottle_plan.append({
+                        "potion_type": [0, 50, 0, 50],
+                        "quantity": MAX,
+                    })
+                    green_ml -= 50 * MAX
+                    dark_ml -= 50 * MAX
+                    total_potions += MAX
+                elif capacity - total_potions > 0 and capacity - total_potions < total:
+                    bottle_plan.append({
+                        "potion_type": [0, 50, 0, 50],
+                        "quantity": capacity - total_potions,
+                    })
+                    green_ml -= 50 * (capacity - total_potions)
+                    dark_ml -= 50 * (capacity - total_potions)
+                    total_potions += (capacity - total_potions)
 
-            # if red_ml >= 25 and green_ml >= 25 and blue_ml >= 25 and dark_ml >= 25 and unmarked_potion < MAX:
-            #     # bottle useless
-            #     total = min(red_ml // 25, green_ml // 25, blue_ml // 25, dark_ml // 25)
-            #     if total < MAX and total + total_potions <= capacity:
-            #         bottle_plan.append({
-            #             "potion_type": [25, 25, 25, 25],
-            #             "quantity": total,
-            #         })
-            #         red_ml -= 25 * total
-            #         green_ml -= 25 * total
-            #         blue_ml -= 25 * total
-            #         dark_ml -= 25 * total
-            #         total_potions += total
-            #     elif total_potions + MAX <= capacity:
-            #         bottle_plan.append({
-            #             "potion_type": [25, 25, 25, 25],
-            #             "quantity": MAX,
-            #         })
-            #         red_ml -= 25 * MAX
-            #         green_ml -= 25 * MAX
-            #         blue_ml -= 25 * MAX
-            #         dark_ml -= 25 * MAX
-            #         total_potions += MAX
-            #     elif capacity - total_potions > 0 and capacity - total_potions < total:
-            #         bottle_plan.append({
-            #             "potion_type": [25, 25, 25, 25],
-            #             "quantity": capacity - total_potions,
-            #         })
-            #         red_ml -= 25 * (capacity - total_potions)
-            #         green_ml -= 25 * (capacity - total_potions)
-            #         blue_ml -= 25 * (capacity - total_potions)
-            #         dark_ml -= 25 * (capacity - total_potions)
-            #         total_potions += (capacity - total_potions)
+            if red_ml >= 25 and green_ml >= 25 and blue_ml >= 25 and dark_ml >= 25 and unmarked_potion < MAX:
+                # bottle useless
+                total = min(red_ml // 25, green_ml // 25, blue_ml // 25, dark_ml // 25)
+                if total < MAX and total + total_potions <= capacity:
+                    bottle_plan.append({
+                        "potion_type": [25, 25, 25, 25],
+                        "quantity": total,
+                    })
+                    red_ml -= 25 * total
+                    green_ml -= 25 * total
+                    blue_ml -= 25 * total
+                    dark_ml -= 25 * total
+                    total_potions += total
+                elif total_potions + MAX <= capacity:
+                    bottle_plan.append({
+                        "potion_type": [25, 25, 25, 25],
+                        "quantity": MAX,
+                    })
+                    red_ml -= 25 * MAX
+                    green_ml -= 25 * MAX
+                    blue_ml -= 25 * MAX
+                    dark_ml -= 25 * MAX
+                    total_potions += MAX
+                elif capacity - total_potions > 0 and capacity - total_potions < total:
+                    bottle_plan.append({
+                        "potion_type": [25, 25, 25, 25],
+                        "quantity": capacity - total_potions,
+                    })
+                    red_ml -= 25 * (capacity - total_potions)
+                    green_ml -= 25 * (capacity - total_potions)
+                    blue_ml -= 25 * (capacity - total_potions)
+                    dark_ml -= 25 * (capacity - total_potions)
+                    total_potions += (capacity - total_potions)
 
             if green_ml >= 100 and green_potion < MAX:
                 # bottle only green
